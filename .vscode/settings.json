@@ -17,5 +17,19 @@
   },
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "workbench.colorCustomizations": {
+    "editorGroup.border": "#cc93d1",
+    "panel.border": "#cc93d1",
+    "sash.hoverBorder": "#cc93d1",
+    "sideBar.border": "#cc93d1",
+    "statusBar.background": "#bb6fc2",
+    "statusBar.border": "#bb6fc2",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#aa4cb2",
+    "statusBarItem.remoteBackground": "#bb6fc2",
+    "statusBarItem.remoteForeground": "#15202b",
+    "tab.activeBorder": "#cc93d1"
+  },
+  "peacock.color": "#bb6fc2"
 }
