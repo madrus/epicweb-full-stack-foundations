@@ -1,71 +1,42 @@
-# Links to Public Files
+# Asset Imports
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/styling/manage-asset-links-in-a-remix-application" />
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/styling/asset-import-caching-issue" />
 
-👨‍💼 We're super excited about this awesome new app! First off, we've got an
-awesome favicon for our site in the `public` directory. Browsers will request
-the `/favicon.ico` by default, but we've got a
-✨ responsive ✨ <InlineFile file="public/favicon.svg" /> that will look good in
-light and dark mode (you will find a media query embedded in the SVG itself). Let's
-get that on the page.
+👨‍💼 Unfortunately, we never know when we're going to want to change our favicon,
+so our caching strategy has to reflect that. We can't just tell the browser to
+cache it forever, so every hour or so the browser has to download the favicon
+again even if it is unchanged.
 
-To do this, we'll need to add a `<link>` to <InlineFile file="app/root.tsx" />.
+One solution would be to cache it for a long time and then whenever we change
+the icon, we could add something to the query string to "bust the cache." Like
+this:
 
-In Remix, you add links to the page by exporting a `links` function:
-
-```tsx filename=app/root.tsx
-// ...
-import { type LinksFunction } from '@remix-run/node'
-
-export const links: LinksFunction = () => {
-	return [
-		{
-			rel: 'stylesheet',
-			// all files in the public directory are served at the root of the site
-			href: '/my-stylesheet.css',
-		},
-	]
-}
-
-//...
+```html
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
 ```
 
-It's important for you to know that Remix puts all the responsibility of what
-appears in the document on you. The `app/root.tsx` component you export is
-responsible for everything that appears between `<html>` and `</html>` and that
-includes the `<head>` element which contains the links that routes define. So
-you need to render the
-[`<Links />`](https://remix.run/docs/en/main/components/links) element in that
-component:
+But that is annoying and error prone. Wouldn't it be cool if a tool did that for
+us? Yes, it would. And Remix can do that.
 
-```tsx filename=app/root.tsx lines=10
-// ...
-import { Links } from '@remix-run/react'
+So, instead of hard-coding the URL for the favicon, we can "import" the asset
+and Remix will take care of getting it into our `public` directory and give us
+the URL to it. As a part of this process it will add a piece to the filename
+that "fingerprints" the file. So, if we change the favicon, the URL will change
+and the browser will download the new one. And we don't have to think about it!
 
-// ...
+Let's do this. 🐨 So first you'll need to move the `favicon.svg`
+from <InlineFile file="public/favicon.svg" /> to <InlineFile file="app/assets/favicon.svg" />.
 
-export default function App() {
-	return (
-		<html>
-			<head>
-				<Links />
-			</head>
-			{/* ... */}
-		</html>
-	)
-}
+Then, in <InlineFile file="app/root.tsx" />, we can import it like this:
+
+```tsx
+import faviconAssetUrl from './assets/favicon.svg'
 ```
 
-> 🦉 Remember, check the `Files` section at the bottom of these instructions for
-> links that will open your editor to the right file you need to alter. My other
-> emoji friends will be waiting there for you to guide you through this task.
-
-🦉 Tip: Check the network tab in the app on the home page. You'll know you got
-it right when you see the `favicon.svg` file loaded.
+And use `faviconAssetUrl` instead of the hard-coded URL.
 
 <callout-warning>
 	SVG favicons are not currently supported in Safari. See [caniuse](https://caniuse.com/link-icon-svg) for browser support.
 </callout-warning>
 
-- [📜 `links` export](https://remix.run/docs/en/main/route/links)
-- [📜 `<Links />`](https://remix.run/docs/en/main/components/links)
+- [📜 Remix Config for `assetsBuildDirectory`](https://remix.run/docs/en/main/file-conventions/remix-config#assetsbuilddirectory) (this is how you configure where Remix puts fingerprinted assets)

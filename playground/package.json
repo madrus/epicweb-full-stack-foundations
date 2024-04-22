@@ -1,11 +1,6 @@
 {
-  "name": "exercises__sep__01.styling__sep__01.problem.public-links",
+  "name": "exercises__sep__01.styling__sep__02.problem.asset-imports",
   "private": true,
-  "kcd-workshop": {
-    "scripts": {
-      "test": "playwright test --trace=retain-on-failure"
-    }
-  },
   "sideEffects": false,
   "type": "module",
   "imports": {
