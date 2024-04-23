@@ -2,14 +2,16 @@ import { type LinksFunction } from '@remix-run/node'
 import { Links, LiveReload, Scripts } from '@remix-run/react'
 import faviconAssetUrl from './assets/favicon.svg'
 import { KCDShop } from './kcdshop.tsx'
-// 🐨 get the fontStylesheetUrl from the ./styles/font.css file
 import fontStylesheetUrl from './styles/font.css'
+// 🐨 Import the tailwind stylesheet here
+import tailwindCssUrl from './styles/tailwind.css'
 
 export const links: LinksFunction = () => {
 	return [
 		{ rel: 'icon', type: 'image/svg+xml', href: faviconAssetUrl },
-		// 🐨 add a link for the fonts file here
 		{ rel: 'stylesheet', href: fontStylesheetUrl },
+		// 🐨 Add the tailwind stylesheet to the links array here
+		{ rel: 'stylesheet', href: tailwindCssUrl },
 	]
 }
 
@@ -20,7 +22,11 @@ export default function App() {
 				<Links />
 			</head>
 			<body>
-				<p>Hello World</p>
+				{/*
+					🐨 add a className with tailwind classes to this p tag to check that
+					tailwind is processing correctly. Try `p-8 text-xl` for example.
+				*/}
+				<p className="p-20 text-5xl">Hello World</p>
 				<Scripts />
 				<KCDShop />
 				<LiveReload />
