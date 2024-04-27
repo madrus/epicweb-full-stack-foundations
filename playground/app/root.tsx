@@ -36,6 +36,7 @@ export default function App() {
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
+						{/* 🐨 switch this div to a Link from @remix-run/react and link to "/" */}
 						<div>
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
@@ -48,6 +49,7 @@ export default function App() {
 				</div>
 
 				<div className="container mx-auto flex justify-between">
+					{/* 🐨 switch this div to a Link from @remix-run/react and link to "/" */}
 					<div>
 						<div className="font-light">epic</div>
 						<div className="font-bold">notes</div>
