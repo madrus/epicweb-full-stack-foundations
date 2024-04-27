@@ -1,77 +1,53 @@
-# Links
+# Route Params
 
-## My Notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/routing/adding-dynamic-parameter-support" />
 
-I have learned about relative paths: `relative="route"` vs `relative="path"`.
-Sometimes we need to go up one level in the current contextual route path,
-instead of one level in the Route hierarchy. Here is an example:
+👨‍💼 It wouldn't make much sense if we needed to make a new route for every single
+user. Instead, we can use a route parameter to capture the username and use it
+in our route handler. We typically call these "params".
 
-```tsx
-...
-// Contact and EditContact do not share additional UI layout
-<Route path="/" element={<Layout />}>
-	<Route path="contacts/:id" element={<Contact />} />
-	<Route path="contacts/:id/edit" element={<EditContact />} />
-</Route>
+With the file-based route convention we're using, we define params by using a
+`$`-prefixed filename segment. For example:
 
-function EditContact() {
-	// Since Contact is not a parent of EditContact we need to go up one level
-	// in the current contextual route path, instead of one level in the Route
-	// hierarchy
-	return (
-		<Link to=".." relative="path">
-			Cancel
-		</Link>
-	)
+| Route File Example                       | Params       | Example Path           |
+| ---------------------------------------- | ------------ | ---------------------- |
+| `app/routes/ships.$shipId.tsx`           | `$shipId`    | `/ships/1234`          |
+| `app/routes/bookings+/$bookingId.tsx`    | `$bookingId` | `/bookings/1234`       |
+| `app/routes/chats+/$chatId.messages.tsx` | `$chatId`    | `/chats/1234/messages` |
+
+🐨 So in this exercise, let's rename our files and folders from using `kody` to use the
+`$username` and from `some-note-id` to `$noteId` params and instead of rendering
+"Kody" we can render the username from params as well as the noteId.
+
+💰 You can get the param value from
+[`useParams()`](https://remix.run/docs/en/main/hooks/use-params) which you can
+`import` from `@remix-run/react`. For example:
+
+```tsx filename=app/routes/pets.$petName.tsx
+import { useParams } from '@remix-run/react'
+
+export default function PetRoute() {
+	const params = useParams()
+	return <h1>Hello {params.petName}</h1>
 }
 ```
 
-## KcD's Material
+Once you've finished with that, you should be able to go to any username and it
+will display that username. Here are some to try:
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/routing/creating-navigation-links-for-seamless-user-experience" />
+<div>
+	* <LinkToApp to="/users/kody" />
+	* <LinkToApp to="/users/Marty123" />
+	* <LinkToApp to="/users/Alfred" />
+	* <LinkToApp to="/users/hannah" />
+	* <LinkToApp to="/users/olivia" />
+	* <LinkToApp to="/users/peter" />
+</div>
 
-👨‍💼 Our users want to get around the application quickly. So, we're going to add
-a few links in a couple places.
+And then for the note:
 
-We want the logo in the header and footer to link to `/`.
-
-On the <LinkToApp to="/users/kody" /> page, we want to link to the user's notes
-route.
-
-On the <LinkToApp to="/users/kody/notes" /> route, we should link back to the
-`/users/kody` page. 💰 Tip, you can use a relative path (`..`), but you'll need
-to learn about
-[the `relative` prop](https://reactrouter.com/en/main/components/link#relative)
-on the `Link` component.
-
-On the notes route, We should also link to the `/users/kody/notes/some-note-id`
-route.
-
-The `Link` component in Remix is a wrapper around the `Link` component from
-react router, so you can learn all about it in
-[the react router `Link` docs](https://reactrouter.com/en/main/components/link).
-
-As a bit of extra credit, do your best to leverage relative routes where you can
-rather than hard-coding the full path of the route. This will make it easier to
-move files around relative to each other in the future.
-
-Also, look into the
-[`NavLink`](https://reactrouter.com/en/main/components/nav-link) component so
-you can highlight the link to the `some-note-id` route when that child route is
-active. You can use the `bg-accent` class name when the link is active.
-
-<callout-info>
-	Remix is built on top of React Router, so you'll often find it beneficial to
-	read the React Router docs. Remix also provides a few extra features on top of
-	React Router, so you'll want to read the Remix docs as well.
-</callout-info>
-
-- [📜 Remix `Link` docs](https://remix.run/docs/en/main/components/link)
-- [📜 Remix `NavLink` docs](https://remix.run/docs/en/main/components/nav-link)
-- [📜 React Router `Link` docs](https://reactrouter.com/en/main/components/link)
-- [📜 React Router `NavLink` docs](https://reactrouter.com/en/main/components/nav-link)
-
-<Warning>
-	<WarningIcon />
-	Blablabla
-</Warning>
+<div>
+	* <LinkToApp to="/users/kody/notes/123" />
+	* <LinkToApp to="/users/kody/notes/abc" />
+	* <LinkToApp to="/users/kody/notes/i-am-cool" />
+</div>
