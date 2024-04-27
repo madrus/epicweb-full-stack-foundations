@@ -1,53 +1,76 @@
-# Route Params
+# Resource Routes
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/routing/adding-dynamic-parameter-support" />
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/routing/adding-a-resource-route" />
 
-👨‍💼 It wouldn't make much sense if we needed to make a new route for every single
-user. Instead, we can use a route parameter to capture the username and use it
-in our route handler. We typically call these "params".
+🦉 So far, every HTTP request we make to our app's routes will result in UI:
 
-With the file-based route convention we're using, we define params by using a
-`$`-prefixed filename segment. For example:
+- `/` - Home page
+- `/users/kody` - Profile page
+- `/users/kody/notes` - Notes page
+- `/users/kody/notes/noteId` - Note page
 
-| Route File Example                       | Params       | Example Path           |
-| ---------------------------------------- | ------------ | ---------------------- |
-| `app/routes/ships.$shipId.tsx`           | `$shipId`    | `/ships/1234`          |
-| `app/routes/bookings+/$bookingId.tsx`    | `$bookingId` | `/bookings/1234`       |
-| `app/routes/chats+/$chatId.messages.tsx` | `$chatId`    | `/chats/1234/messages` |
+But there are lots of use cases for URLs that don't return UI. For example:
 
-🐨 So in this exercise, let's rename our files and folders from using `kody` to use the
-`$username` and from `some-note-id` to `$noteId` params and instead of rendering
-"Kody" we can render the username from params as well as the noteId.
+- `/api/users` - Get a list of users
+- `/healthcheck` - Get a report of the health of the application
+- `/images/some-image-id` - Get an image
 
-💰 You can get the param value from
-[`useParams()`](https://remix.run/docs/en/main/hooks/use-params) which you can
-`import` from `@remix-run/react`. For example:
+For these, the HTTP request and response is a little different from our UI
+routes. Instead of the request expecting an HTML response, it expects JSON, or
+plaintext, or an image. In some cases these requests could be non-GET requests
+as well.
 
-```tsx filename=app/routes/pets.$petName.tsx
-import { useParams } from '@remix-run/react'
+In Remix, these routes are known as
+["Resource Routes"](https://remix.run/docs/en/main/guides/resource-routes) and
+they are pretty simple. Here's the rule that determines whether a route is a
+resource route or not:
 
-export default function PetRoute() {
-	const params = useParams()
-	return <h1>Hello {params.petName}</h1>
+<callout-success>
+	A <strong>Resource Route</strong> is like a regular route, but it doesn't have
+	a `default` export.
+</callout-success>
+
+That's it. Just don't have a default export and you're working in a resource
+route.
+
+The behavior of a resource route is what you might expect. For regular routes,
+the entire nested routing structure is called and rendered to get the final
+result. For resource routes, only the route that matches the request is called.
+So, with a resource route, the `loader` in the `app/root.tsx` will not be run.
+
+👨‍💼 We'd like you to create a resource route for a healthcheck for our
+application. We can put this route at any URL we like (`/healthcheck`, or `/hc`,
+etc.), but we're going to put it at `/resources/healthcheck`.
+
+Our application is pretty simple, so for now, we'll keep the resource route
+simple as well. We'll just return a plaintext response with the text
+`"OK"`.
+
+So create a file at<InlineFile file="app/routes/resources+/healthcheck.tsx" />,
+and create a loader that returns a plaintext response with the text `"OK"`.
+
+<details>
+
+<summary>💰 The loader</summary>
+
+If you need the extra help, here's what the loader code should look like:
+
+```tsx
+export async function loader() {
+	return new Response('OK')
 }
 ```
 
-Once you've finished with that, you should be able to go to any username and it
-will display that username. Here are some to try:
+</details>
 
-<div>
-	* <LinkToApp to="/users/kody" />
-	* <LinkToApp to="/users/Marty123" />
-	* <LinkToApp to="/users/Alfred" />
-	* <LinkToApp to="/users/hannah" />
-	* <LinkToApp to="/users/olivia" />
-	* <LinkToApp to="/users/peter" />
-</div>
+You'll know you got it when you go to: <LinkToApp to="/resources/healthcheck" reloadDocument />
+and all you see is "OK".
 
-And then for the note:
+<callout-warning>
+	<strong>Warning</strong>: You may notice that doing a client-side navigation to
+  a resource route breaks the app. This is because that route doesn't exist in
+  a UI context. So you need to make sure if you link to a resource route, you
+  either use a regular `<a>` or add the `reloadDocument` prop to the Link.
+</callout-warning>
 
-<div>
-	* <LinkToApp to="/users/kody/notes/123" />
-	* <LinkToApp to="/users/kody/notes/abc" />
-	* <LinkToApp to="/users/kody/notes/i-am-cool" />
-</div>
+- [📜 Resource Routes](https://remix.run/docs/en/main/guides/resource-routes)
