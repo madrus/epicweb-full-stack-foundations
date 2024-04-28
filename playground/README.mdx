@@ -1,5 +1,37 @@
 # Loaders
 
+## My Notes
+
+`DataFunctionArgs` is deprecated but can be just replaced by `LoaderFunctionArgs`.
+
+If we use a loader, we don't need to use `useParams`, as we can get the params
+and data from the `useLoaderData`.
+
+An interesting alternative is the way to return data from a loader function.
+
+Option 1: using `Response`:
+
+```tsx
+const body = JSON.stringify({user: {name: user.name, username: user.username}})
+	return new Response(body, {
+	headers: {
+		'Content-Type': 'application/json',
+	},
+})
+```
+
+Option 2: using the Remix `json` util:
+
+```tsx
+return json({
+	user: { name: user.name, username: user.username },
+})
+```
+
+KcD recommends the second one but he advises to learn both.
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/loading/loading-data-to-your-database" />
 
 👨‍💼 Now that our routing is all taken care of, Kellie (your coworker 🧝‍♂️) has
