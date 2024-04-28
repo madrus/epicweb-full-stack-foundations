@@ -1,53 +1,36 @@
-import { type LoaderFunctionArgs } from '@remix-run/node'
+import { db } from '#app/utils/db.server.ts'
+import { invariantResponse } from "#app/utils/misc.tsx"
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 
-// 🐨 get the database from the utils directory using
-import { db } from '#app/utils/db.server.ts'
-
-// 🐨 add a `loader` export here which uses the params from the DataFunctionArgs
-// 🐨 you'll get the username from params.username
 export async function loader({ params }: LoaderFunctionArgs) {
-	// 💰 Here's how you get the user from the database:
 	const user = db.user.findFirst({
 		where: {
-			username: { equals: params.username },
+			username: {
+				equals: params.username,
+			},
 		},
 	})
-	const body = JSON.stringify(user)
-	// 🐨 Return the necessary user data using Remix's json util
-	// return json({
-	// 	// 🦺 TypeScript will complain about the user being possibly undefined, we'll
-	// 	// fix that in the next section
-	// 	// @ts-expect-error
-	// 	user: { name: user.name, username: user.username },
-	// })
-	// 💯 as extra credit, try to do it with new Response instead of using the json util just for fun
-	// 🦉 Note, you should definitely use the json helper as it's easier and works better with TypeScript
-	// but feel free to try it with new Response if you want to see how it works.
-	return new Response(body, {
-		headers: {
-			'Content-Type': 'application/json',
-		},
+	// 🐨 add an if statement here to check whether the user exists and throw an
+	// appropriate 404 response if not.
+	// 💯 as an extra credit, you can try using the invariantResponse utility from
+	// "#app/utils/misc.ts" to do this in a single line of code (just make sure to
+	// supply the proper status code)
+	// if (!user) {
+	invariantResponse(user, `User ${params.username} not found`, { status: 404 })
+			// throw new Response(`User ${params.username} not found`, { status: 404 })
+		// }
+	// 🦺 then you can remove the @ts-expect-error below 🎉
+	return json({
+		user: { name: user.name, username: user.username },
 	})
 }
 
 export default function ProfileRoute() {
-	// 💣 we no longer need to get the params in the UI, delete this:
-	// const params = useParams()
-	// 🐨 get the data from the loader with useLoaderData
-	const { name, username } = useLoaderData<typeof loader>() as {
-		name: string
-		username: string
-	}
-
+	const data = useLoaderData<typeof loader>()
 	return (
 		<div className="container mb-48 mt-36">
-			{/*
-				🐨 swap params.username with the user's name
-				(💯 note, the user's name is not required, so as extra credit, add a
-				fallback to the username)
-			*/}
-			<h1 className="text-h1">{name ?? username}</h1>
+			<h1 className="text-h1">{data.user.name ?? data.user.username}</h1>
 			<Link to="notes" className="underline">
 				Notes
 			</Link>

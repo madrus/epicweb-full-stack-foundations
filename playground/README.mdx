@@ -1,75 +1,77 @@
-# Loaders
+# Handle Missing Data
 
 ## My Notes
 
-`DataFunctionArgs` is deprecated but can be just replaced by `LoaderFunctionArgs`.
-
-If we use a loader, we don't need to use `useParams`, as we can get the params
-and data from the `useLoaderData`.
-
-An interesting alternative is the way to return data from a loader function.
-
-Option 1: using `Response`:
+KcD offers an interesting way of handling errors related to missing data.
+The idea is to throw a custom Response specifying the status code 404.
+This can be done in Remix by using something like `throw new Response('Not found', { status: 404 })`.
+But in `app/utils/misc.tsx` there is a special handler for this, `invariantResponse`:
 
 ```tsx
-const body = JSON.stringify({user: {name: user.name, username: user.username}})
-	return new Response(body, {
-	headers: {
-		'Content-Type': 'application/json',
-	},
-})
+invariantResponse(note, `Note with id ${params.noteId} not found`, { status: 404 })
 ```
-
-Option 2: using the Remix `json` util:
-
-```tsx
-return json({
-	user: { name: user.name, username: user.username },
-})
-```
-
-KcD recommends the second one but he advises to learn both.
 
 ## KcD's Workshop
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/loading/loading-data-to-your-database" />
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/loading/handling-error-messages-and-status-codes-in-web-development" />
 
-👨‍💼 Now that our routing is all taken care of, Kellie (your coworker 🧝‍♂️) has
-taken some time to make the app look a little bit nicer and now you need to add
-some data loading.
+👨‍💼 One of our Quality Assurance folks discovered an issue. If you go to a user
+that does not exist, the app crashes. For example,
+try this one: <LinkToApp to="/users/i-do-not-exist" /> 😬
 
-🧝‍♂️ I've also created a temporary fake database for us to use until we get around
-to actually putting together a real database in the future. You can find it in
-the `app/utils/db.server.ts` file if you want to, but don't worry about it
-because Marty (the moneybag 💰) will give you all the code you need to work with
-it as it's not really necessary for what you're learning today.
+We had to ignore some TypeScript errors with `// @ts-expect-error` which should
+have tipped us off about this problem... 🦺 Lily the life jacket is not amused.
 
-🧝‍♂️ I've also added a user with some notes in the database by default as well.
-The username is `kody` and I've added a link for Kody's notes on the home page
-in the top right corner to make it easier for you to get to his first note which
-can be found at <LinkToApp to="/users/kody/notes/d27a197e" />.
+We need to handle this case. That should be a `404` error. So after trying to
+get the `user` from the database, you're going to need to check whether the
+returned `user` exists. If they don't, then you should throw a `404` error.
+Here's an example how you do that:
 
-<callout-muted class="aside">
-	The tool we're using is [@mswjs/data](https://github.com/mswjs/data) which you
-	may find useful in other contexts. But again, don't worry too much about it.
-	We'll get to the real database stuff in another workshop.
-</callout-muted>
+```tsx filename=app/routes/sandwiches.$id.tsx
+export async function loader({ params }) {
+	const sandwich = await db.sandwich.findFirst({
+		where: { id: params.id },
+	})
 
-👨‍💼 Great, with that out of the way, it's time for us to actually start loading
-data. Based on what you learned in the background for this exercise, you should
-be familiar with the conventions necessary to load data into the UI and the
-emoji will be there to guide you along as you go. We're going to be loading data
-on the profile, list of notes, and note page.
+	if (!sandwich) {
+		throw new Response('Sandwich not found', { status: 404 })
+	}
 
-🐨 All the instructions for this exercise will be in the files themselves. You
-can go through them in any order. They will be pretty similar to each other.
+	return json({ sandwich })
+}
+```
 
-<callout-success>
-	Don't forget you can use the "Files" menu below to open the files necessary
-	for this workshop.
-</callout-success>
+Hmmm... `throw` a response!? How weird is that? Well, in Remix it's exactly how
+you solve this problem. It allows you to easily exit code flow and send a
+response right away. You can even put it into a utility function:
 
-<callout-muted class="aside">
-	And if you *really* get stuck, you can always look at the diff tab to see what
-	you're missing.
-</callout-muted>
+{/* TODO: add types and make this an assertion function that infers and maintains the typing of sandwich. Possibly even make it generic. */}
+
+```tsx filename=utils.ts
+function assertDefined<Value>(
+	value: Value | null | undefined,
+): asserts value is Value {
+	if (value === undefined || value === null) {
+		throw new Response('Not found', { status: 404 })
+	}
+}
+```
+
+```tsx filename=app/routes/sandwiches.$id.tsx
+export async function loader({ params }) {
+	const sandwich = await db.sandwich.findFirst({
+		where: { id: params.id },
+	})
+
+	assertDefined(sandwich)
+
+	return json({ sandwich })
+}
+```
+
+Remix will handle catching the response for us and send the response we threw
+along. But it does so in a special way which we'll get to in a future exercise.
+For now, just handling the error with a proper status code is enough.
+
+So please handle possible missing data in the loaders of the profile, note list,
+and note routes.
