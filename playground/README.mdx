@@ -1,18 +1,19 @@
-# Forms
+# Actions
 
-## My Notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/mutations/handling-post-requests-for-form-submission" />
 
-Remix has its own form component, `Form`, that simplifies the process of building
-forms. For the moment, it looks like syntactic sugar to me but I am sure there will be more to come.
+👨‍💼 Just like our `loader` responds to `GET` requests for data, the `action`
+responds to non-`GET` requests for data. The `action` accepts the same
+parameters as the `loader` and is expected to return a `Response`. It's also
+typically expected to return a `redirect` or a `json` response and can use the
+same utilities.
 
-## KcD's Workshop
+So now, we want you to get the `formData` from the `request` and use it to
+update the note, and then redirect back to the note's page.
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/mutations/building-forms" />
+<callout-muted>
+	Don't worry about doing any validation or error handling. We'll cover that
+	later. Additionally, we'll handle the TypeScript errors in the next step.
+</callout-muted>
 
-👨‍💼 We need to add support for editing notes. You'll be required to make a form
-for the notes edit page. In this first step we're only expecting you to make the
-form itself, don't worry about making it work yet (Remix won't let you anyway).
-
-The emoji will be your guide through this exercise!
-
-- [📜 `<Form>`](https://remix.run/docs/en/main/components/form)
+- [📜 `action`](https://remix.run/docs/en/main/route/action)
