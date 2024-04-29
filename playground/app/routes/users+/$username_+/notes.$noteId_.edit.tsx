@@ -1,11 +1,5 @@
-import {
-	type ActionFunctionArgs,
-	json,
-	type LoaderFunctionArgs,
-	redirect,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
-
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Input } from '#app/components/ui/input.tsx'
@@ -14,7 +8,7 @@ import { Textarea } from '#app/components/ui/textarea.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -30,20 +24,21 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	})
 }
 
-// 🐨 export an action function here. You'll need the request and params from the LoaderFunctionArgs
-//   🐨 Get the formData from the request (📜 https://developer.mozilla.org/en-US/docs/Web/API/Request/formData)
-//   🐨 Get the title and content from the formData
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const title = formData.get('title') as string
-	const content = formData.get('content') as string
-	//   🐨 update the note:
-	//   💰 here's how you can do it.
+	const title = formData.get('title')
+	const content = formData.get('content')
+	// 🐨 add a check to make certain that title and content are both a string
+	// if they are not, throw an error
+	// 💯 as an extra credit, throw a more descriptive 400 Response instead of an error
+	// 💯 as an extra credit, try using the invariantResponse function from "#app/utils/misc.ts"
+
 	db.note.update({
 		where: { id: { equals: params.noteId } },
+		// @ts-expect-error 🦺 we'll fix this next...
 		data: { title, content },
 	})
-	//   🐨 redirect the user back to the note's page
+
 	return redirect(`/users/${params.username}/notes/${params.noteId}`)
 }
 
