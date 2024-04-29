@@ -1,7 +1,8 @@
-import { db } from '#app/utils/db.server.ts'
-import { invariantResponse } from "#app/utils/misc.tsx"
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
+
+import { db } from '#app/utils/db.server.ts'
+import { invariantResponse } from '#app/utils/misc.tsx'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const user = db.user.findFirst({
@@ -18,8 +19,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	// supply the proper status code)
 	// if (!user) {
 	invariantResponse(user, `User ${params.username} not found`, { status: 404 })
-			// throw new Response(`User ${params.username} not found`, { status: 404 })
-		// }
+	// throw new Response(`User ${params.username} not found`, { status: 404 })
+	// }
 	// 🦺 then you can remove the @ts-expect-error below 🎉
 	return json({
 		user: { name: user.name, username: user.username },

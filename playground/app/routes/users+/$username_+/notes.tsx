@@ -1,7 +1,8 @@
-import { db } from '#app/utils/db.server.ts'
-import { cn, invariantResponse } from '#app/utils/misc.tsx'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
+
+import { db } from '#app/utils/db.server.ts'
+import { cn, invariantResponse } from '#app/utils/misc.tsx'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const owner = db.user.findFirst({
@@ -17,8 +18,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	// "#app/utils/misc.ts" to do this in a single line of code (just make sure to
 	// supply the proper status code)
 	// if (!owner) {
-	invariantResponse(owner, `Owner ${params.username} not found`, { status: 404 })
-		// throw new Response(`Owner ${params.username} not found`, { status: 404 })
+	invariantResponse(owner, `Owner ${params.username} not found`, {
+		status: 404,
+	})
+	// throw new Response(`Owner ${params.username} not found`, { status: 404 })
 	// }
 	// 🦺 then you can remove both of the @ts-expect-errors below 🎉
 	const notes = db.note

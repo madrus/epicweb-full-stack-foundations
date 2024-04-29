@@ -1,7 +1,8 @@
-import { db } from '#app/utils/db.server.ts'
-import { invariantResponse } from '#app/utils/misc.tsx'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+
+import { db } from '#app/utils/db.server.ts'
+import { invariantResponse } from '#app/utils/misc.tsx'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const note = db.note.findFirst({
@@ -16,10 +17,12 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	// 💯 as an extra credit, you can try using the invariantResponse utility from
 	// "#app/utils/misc.ts" to do this in a single line of code (just make sure to
 	// supply the proper status code)
-		// if (!owner) {
-			invariantResponse(note, `Note with id ${params.noteId} not found`, { status: 404 })
-			// throw new Response(`Note with id ${params.noteId} not found`, { status: 404 })
-		// }
+	// if (!owner) {
+	invariantResponse(note, `Note with id ${params.noteId} not found`, {
+		status: 404,
+	})
+	// throw new Response(`Note with id ${params.noteId} not found`, { status: 404 })
+	// }
 	// 🦺 then you can remove the @ts-expect-error below 🎉
 	return json({
 		note: { title: note.title, content: note.content },
