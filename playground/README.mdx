@@ -1,5 +1,17 @@
 # Actions
 
+## My Notes
+
+For actions, `DataFunctionArgs` can be replaced with `ActionFunctionArgs`.
+
+Action loader takes two parameters, `request` and `params`. From request we can
+extract the form values, `title` and `content`. From params we can extract `username` and `noteId`.
+We then use `title` and `content` to update the note in the database.
+
+Once that is done, we redirect back to the note's page using the full URL.
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/mutations/handling-post-requests-for-form-submission" />
 
 👨‍💼 Just like our `loader` responds to `GET` requests for data, the `action`
