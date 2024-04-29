@@ -1,10 +1,11 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
-
+import { json, type DataFunctionArgs } from '@remix-run/node'
+import { Link, useLoaderData } from '@remix-run/react'
+import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
+import { Button } from '#app/components/ui/button.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -12,18 +13,9 @@ export async function loader({ params }: LoaderFunctionArgs) {
 			},
 		},
 	})
-	// 🐨 add an if statement here to check whether the note exists and throw an
-	// appropriate 404 response if not.
-	// 💯 as an extra credit, you can try using the invariantResponse utility from
-	// "#app/utils/misc.ts" to do this in a single line of code (just make sure to
-	// supply the proper status code)
-	// if (!owner) {
-	invariantResponse(note, `Note with id ${params.noteId} not found`, {
-		status: 404,
-	})
-	// throw new Response(`Note with id ${params.noteId} not found`, { status: 404 })
-	// }
-	// 🦺 then you can remove the @ts-expect-error below 🎉
+
+	invariantResponse(note, 'Note not found', { status: 404 })
+
 	return json({
 		note: { title: note.title, content: note.content },
 	})
@@ -39,6 +31,12 @@ export default function NoteRoute() {
 				<p className="whitespace-break-spaces text-sm md:text-lg">
 					{data.note.content}
 				</p>
+			</div>
+			<div className={floatingToolbarClassName}>
+				<Button variant="destructive">Delete</Button>
+				<Button asChild>
+					<Link to="edit">Edit</Link>
+				</Button>
 			</div>
 		</div>
 	)
