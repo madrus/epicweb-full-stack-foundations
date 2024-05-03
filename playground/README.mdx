@@ -1,5 +1,22 @@
 # Button Forms
 
+## My notes
+
+1. I found it an interesting way to wrap an action button in a `<Form />` element
+   and thus add all the power of the Form API including the data validation, dubble submits, etc.
+1. Also I have come across the `asChild` pattern from RadixUI.
+   Rather than setting an `as` prop to the component name, `<Button as={Link} />`,
+   you set `asChild` to true and pass the custom component as a child.
+   ```tsx
+   <Button asChild>
+   	<Link to="edit">Edit</Link>
+   </Button>
+   ```
+   This `asChild` attribute is a boolean. If it is present, the Link will be styled as a button.
+   Otherwise render a default component.
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/mutations/button-forms-data" />
 
 🦉 Folks who are used to building client-side focused applications may be
