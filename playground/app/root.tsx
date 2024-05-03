@@ -59,6 +59,7 @@ export default function App() {
 					<p>Built with ♥️ by {data.username}</p>
 				</div>
 				<div className="h-5" />
+				{/* 🐨 Add ScrollRestoration from '@remix-run/react' here */}
 				<Scripts />
 				<EpicShop />
 				<LiveReload />
