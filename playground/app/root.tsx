@@ -1,16 +1,8 @@
 import os from 'node:os'
 import { cssBundleHref } from '@remix-run/css-bundle'
-import { json, type LinksFunction } from '@remix-run/node'
-import {
-	Link,
-	Links,
-	LiveReload,
-	Outlet,
-	Scripts,
-	useLoaderData,
-} from '@remix-run/react'
+import { type LinksFunction, json } from '@remix-run/node'
+import { Link, Links, Outlet, useLoaderData } from '@remix-run/react'
 import faviconAssetUrl from './assets/favicon.svg'
-import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 
@@ -59,9 +51,14 @@ export default function App() {
 					<p>Built with ♥️ by {data.username}</p>
 				</div>
 				<div className="h-5" />
-				<Scripts />
-				<EpicShop />
-				<LiveReload />
+				{/* 🐨 add the <Scripts /> component from '@remix-run/react' */}
+
+				{/* To improve the development experience, we've got some components we can render here as well: */}
+				{/* 💯 add the <EpicShop /> component from './epicshop.tsx' */}
+				{/* This is responsible for keeping the iframe in sync with the KCD Workshop App */}
+
+				{/* 💯 add the <LiveReload /> component from '@remix-run/react' */}
+				{/* This is responsible for updating the app whenever you make code changes (HMR/HDR etc). */}
 			</body>
 		</html>
 	)

@@ -1,30 +1,26 @@
-# Intent
+# Scripts
 
-## My Notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/javascript-in-remix-from-optional-to-essential" />
 
-I finally got it that an `action` has two parameters, `request` and `params`.
-The `request` holds information about the form inputs.
-The `params` holds information about the route variables.
-Also, it was nice to learn that buttons inside a form are also input controls
-and can therefore have names and values.
+🧝‍♂️ I removed JavaScript script tags from <InlineFile file="app/root.tsx" />
+because they are unnecessary. Everything we've done so far works whether
+JavaScript is running in the browser or not. Go ahead and try it out. Open up
+the app (in a new tab) and check the network tab. You'll notice there's no
+JavaScript loaded by the application. Click around and submit forms and you'll
+find that everything works as expected. The browser has been able to do this
+navigation and form submission stuff since the very beginning and it's pretty
+good at it.
 
-## KcD's Workshop
+But now, we've actually got some things we want to do with client-side
+JavaScript, so we want to add it back.
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/mutations/handling-multiple-actions-in-a-single-action-function" />
+👨‍💼 That's right, we want to start adding some client-side pending UI,
+prefetching, and eventually even optimistic UI. It's going to be great. But
+we'll need JavaScript on the client to do it.
 
-👨‍💼 Our `action` for the delete button is pretty simple. In the future we'll
-probably add a "favorite" button where users can mark a note as a favorite, but
-our `action` only handles deleting a note.
+So, let's add the `<Scripts />` component back. We'll also want to add a couple
+other components, but don't worry... 🐨 Kody will be there to tell you what to
+do.
 
-To help us to distinguish the user's preferred action, we'll use a common
-pattern of adding a `name` and `value` to the delete button:
-
-```html
-<button type="submit" name="intent" value="delete">Delete</button>
-```
-
-🤯 yes, it's true. Submit buttons are form controls, just like inputs, and can
-therefore have names and values. From there you can get the intent from the
-request form data and handle it accordingly.
-
-Doing things this way will also ensure the request is performed properly.
+- [📜 `<Scripts />`](https://remix.run/docs/en/main/components/scripts)
+- [📜 `<LiveReload />`](https://remix.run/docs/en/main/components/live-reload)
