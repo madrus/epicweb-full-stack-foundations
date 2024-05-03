@@ -1,17 +1,11 @@
-import {
-	type ActionFunctionArgs,
-	json,
-	type LoaderFunctionArgs,
-	redirect,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, Link, useLoaderData } from '@remix-run/react'
-
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -27,15 +21,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-	// 🐨 get the formData from the request
+export async function action({ request, params }: DataFunctionArgs) {
 	const formData = await request.formData()
-	// 🐨 get the intent from the formData
 	const intent = formData.get('intent')
-	// 🐨 if the intent is not "delete", then throw a 400 Response
-	// 💰 you can use invariantResponse from '#app/utils/misc.tsx' for this
-	invariantResponse(intent === 'delete', 'Invalid intent', { status: 400 })
-	// 🐨 if the intent is "delete" then proceed
+
+	invariantResponse(intent === 'delete', 'Invalid intent')
 
 	db.note.delete({ where: { id: { equals: params.noteId } } })
 	return redirect(`/users/${params.username}/notes`)
@@ -54,12 +44,11 @@ export default function NoteRoute() {
 			</div>
 			<div className={floatingToolbarClassName}>
 				<Form method="POST">
-					{/* 🐨 add a name="intent" and value="delete" to this button */}
 					<Button
-						name="intent"
-						value="delete"
 						type="submit"
 						variant="destructive"
+						name="intent"
+						value="delete"
 					>
 						Delete
 					</Button>
