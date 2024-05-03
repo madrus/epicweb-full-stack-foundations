@@ -1,5 +1,6 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import { type DataFunctionArgs, json } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
+
 import { db } from '#app/utils/db.server.ts'
 import { cn, invariantResponse } from '#app/utils/misc.tsx'
 
@@ -48,7 +49,6 @@ export default function NotesRoute() {
 								<li key={note.id} className="p-1 pr-0">
 									<NavLink
 										to={note.id}
-										// 🐨 add preventScrollReset to the NavLink
 										className={({ isActive }) =>
 											cn(navLinkDefaultClassName, isActive && 'bg-accent')
 										}
