@@ -1,11 +1,5 @@
-import {
-	type ActionFunctionArgs,
-	json,
-	type LoaderFunctionArgs,
-	redirect,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
-
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Input } from '#app/components/ui/input.tsx'
@@ -14,7 +8,7 @@ import { Textarea } from '#app/components/ui/textarea.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -30,7 +24,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const title = formData.get('title')
 	const content = formData.get('content')
