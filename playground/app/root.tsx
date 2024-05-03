@@ -61,7 +61,7 @@ export default function App() {
 					<p>Built with ♥️ by {data.username}</p>
 				</div>
 				<div className="h-5" />
-				{/* 🐨 add the <Scripts /> component from '@remix-run/react' */}
+				{/* 🐨 Add ScrollRestoration from '@remix-run/react' here */}
 				<Scripts />
 				{/* To improve the development experience, we've got some components we can render here as well: */}
 				{/* 💯 add the <EpicShop /> component from './epicshop.tsx' */}
