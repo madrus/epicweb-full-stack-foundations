@@ -1,5 +1,11 @@
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import {
+	type ActionFunctionArgs,
+	json,
+	type LoaderFunctionArgs,
+	redirect,
+} from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
+
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Input } from '#app/components/ui/input.tsx'
@@ -8,7 +14,7 @@ import { Textarea } from '#app/components/ui/textarea.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -24,19 +30,27 @@ export async function loader({ params }: DataFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: DataFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	const title = formData.get('title')
-	const content = formData.get('content')
+	const content = formData.get('content1')
 	// 🐨 add a check to make certain that title and content are both a string
 	// if they are not, throw an error
-	// 💯 as an extra credit, throw a more descriptive 400 Response instead of an error
-	// 💯 as an extra credit, try using the invariantResponse function from "#app/utils/misc.ts"
+	if (typeof title !== 'string') {
+		// 💯 as an extra credit, throw a more descriptive 400 Response instead of an error
+		throw new Response('The value of Title should be a string', { status: 400 })
+	}
+	if (typeof content !== 'string') {
+		// 💯 as an extra credit, try using the invariantResponse function from "#app/utils/misc.ts"
+		invariantResponse(content, 'The value of Content should be a string', {
+			status: 400,
+		})
+	}
 
 	db.note.update({
 		where: { id: { equals: params.noteId } },
-		// @ts-expect-error 🦺 we'll fix this next...
-		data: { title, content },
+		data: { title, content: typeof content === 'string' ? content : '' }, // this works
+		// data: { title, content }, // this gives an error: "Type 'string | File' is not assignable to type 'string'"
 	})
 
 	return redirect(`/users/${params.username}/notes/${params.noteId}`)

@@ -1,5 +1,31 @@
 # FormData Types
 
+## My Notes
+
+An important thing to know about `request.formData` is the values stored in it can have three different types:
+
+- `null` - the value doesn't exist in the form data at all
+- `string` - This applies to inputs (including checkboxes and radio buttons), textareas, and select elements.
+- `File` - This applies to file inputs.
+
+In our excercises we have two extra credits. One of them is to use `throw new Response`,
+another one is to use `invariantResponse`. Both work but the second one gives compile time typescript error.
+
+```text
+Type 'string | File' is not assignable to type 'string | ((prevValue: string, entity: Value<{ id: PrimaryKey<string>; title: StringConstructor; content: StringConstructor; createdAt: () => Date; owner: OneOf<...>; }, { ...; }>) => string) | undefined'.
+Type 'File' is not assignable to type 'string | ((prevValue: string, entity: Value<{ id: PrimaryKey<string>; title: StringConstructor; content: StringConstructor; createdAt: () => Date; owner: OneOf<...>; }, { ...; }>) => string) | undefined'.ts(2322)
+```
+
+Typescript understands the check condition `if (typeof title !== 'string') {...}` if we `throw` but does not
+if we just use the `invariantResponse`. Using cast `as string` does not help.
+To make it work I had to check the type the second time:
+
+```ts
+{ data: { title, content: typeof content === 'string' ? content : '' }
+```
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/mutations/handling-form-errors-and-user-mistakes" />
 
 🦉 An important thing to know about `request.formData` is the values stored in
