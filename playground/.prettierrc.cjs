@@ -36,7 +36,7 @@ module.exports = {
 	importOrder: [
 		'^react',
 		'^node',
-		'^@remix-run\/(node|react)',
+		'^@remix-run/(css-bundle|node|react)',
 		'^@',
 		'^(jest)(.*)',
 		'^(src|test)(.*)',

@@ -1,7 +1,16 @@
-import { cssBundleHref } from '@remix-run/css-bundle'
-import { type LinksFunction, json } from '@remix-run/node'
-import { Link, Links, LiveReload, Outlet, Scripts, useLoaderData } from '@remix-run/react'
 import os from 'node:os'
+
+import { cssBundleHref } from '@remix-run/css-bundle'
+import { json, type LinksFunction } from '@remix-run/node'
+import {
+	Link,
+	Links,
+	LiveReload,
+	Outlet,
+	Scripts,
+	useLoaderData,
+} from '@remix-run/react'
+
 import faviconAssetUrl from './assets/favicon.svg'
 import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
