@@ -24,6 +24,7 @@ export default function ProfileRoute() {
 	return (
 		<div className="container mb-48 mt-36">
 			<h1 className="text-h1">{data.user.name ?? data.user.username}</h1>
+			{/* 🐨 add a prefetch="intent" to this link */}
 			<Link to="notes" className="underline">
 				Notes
 			</Link>
