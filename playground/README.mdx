@@ -1,5 +1,25 @@
 # Custom Scripts
 
+## My Notes
+
+Securitywise it is better to use the same environment variables for both client and server.
+For that we use `entry.client.tsx` and `server.client.tsx`.
+In the `entry.server.tsx` we have to set the `ENV` variable in the global scope:
+
+```tsx
+global.ENV = getEnv()
+```
+
+Now, in the `entry.client.tsx` we can access the `ENV` variable from the global scope:
+
+```tsx
+if (ENV.MODE === 'development') {
+	import('./utils/devtools.tsx').then(({ init }) => init())
+}
+```
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/environment-variables-for-client-side-and-server-side" />
 
 <callout-info>
