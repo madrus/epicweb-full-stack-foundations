@@ -1,4 +1,5 @@
 import os from 'node:os'
+
 import { cssBundleHref } from '@remix-run/css-bundle'
 import { json, type LinksFunction } from '@remix-run/node'
 import {
@@ -10,6 +11,7 @@ import {
 	ScrollRestoration,
 	useLoaderData,
 } from '@remix-run/react'
+
 import faviconAssetUrl from './assets/favicon.svg'
 import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'

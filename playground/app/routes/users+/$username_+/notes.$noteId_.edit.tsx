@@ -41,6 +41,7 @@ export async function action({ request, params }: DataFunctionArgs) {
 
 export default function NoteEdit() {
 	const data = useLoaderData<typeof loader>()
+	// 🐨 determine whether this form is submitting
 
 	return (
 		<Form
@@ -63,6 +64,9 @@ export default function NoteEdit() {
 				<Button variant="destructive" type="reset">
 					Reset
 				</Button>
+				{/* 🐨 disable this button when the form is submitting */}
+				{/* 🐨 display some indicator when the form is submitting */}
+				{/* 💯 you can use the StatusButton which has a status prop */}
 				<Button type="submit">Submit</Button>
 			</div>
 		</Form>

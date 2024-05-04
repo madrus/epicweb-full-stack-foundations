@@ -1,45 +1,54 @@
-# Prefetching
+# Pending UI
 
-## My Notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/improve-the-ux-with-pending-ui" />
 
-This excercise seems to be trivial as we only need to add `prefetch="intent"` by a couple of links.
-What was difficult for me was to find out how to see the prefetch working in the Chrome DevTools.
-Here is what I have found out:
+👨‍💼 Some of our users have complained that the UI doesn't feel responsive because
+after they submit their profile form, it can take a while before there are any
+updates and they're not sure whether they did something wrong.
 
-- use Chrome not Firefix as the latter does not show the prefetch
-- do NOT disable cache in the network tab
-- refresh the page with the link with prefetch and clean the log in the network tab
-- hover over the link to see a new line appear in the log with method `GET`, type `json`,
-  size in bytes, and nothing in the response body
-- click on the link and now the new line will have method `GET`, type `fetch`,
-  size `(prefetch cache)` and the fetched data in the response body
+This is one of the things the browser did for us before we brought JavaScript
+along for the party. Once we brought JavaScript along, we started doing
+`event.preventDefault()` which removed the full-page refresh, but also removed
+the pending UI feedback the browser shows for us. We need to add that back.
 
-## KcD's Workshop
+Could you give them some feedback while they're waiting for the server to
+respond? We want to do this specifically for when the user submits the note
+edit form and hits the delete button.
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/optimizing-resource-loading-with-javascript-prefetching" />
+Remix allows you to give the user an even better experience by showing "pending
+UI" using
+[the `useNavigation` hook](https://remix.run/docs/en/main/hooks/use-navigation).
+Only one transition can be happening at a time in the web (you can't go to two
+places at once) so that's true here as well. This means you'll need to use the
+information from the navigation to determine if the form is submitting or not.
 
-👨‍💼 Now that we have client-side JavaScript, we can start doing cool things to
-improve the user experience. Thanks to the way Remix has us structure our code,
-Remix knows exactly the code and data needed for every route just by looking at
-the URL. So when we render a link like this:
+Here's an example of `useNavigation` that should help you get a sense of the
+information you can get from the `navigation` object (📜 also check out
+[the `useFormAction` hook](https://remix.run/docs/en/main/hooks/use-form-action)).
 
-```html
-<a href="/users/kody/notes">Kody's Notes</a>
+```tsx filename=app/routes/sandwiches.chooser.tsx
+export default function SandwichChooser() {
+	const navigation = useNavigation()
+	const formAction = useFormAction()
+	const isSubmitting =
+		navigation.state !== 'idle' &&
+		navigation.formMethod === 'POST' &&
+		navigation.formAction === formAction
+	return (
+		<Form method="POST">
+			<label>
+				Type: <input name="sandwichType" />
+			</label>
+			<button type="submit" disabled={isSubmitting}>
+				{isSubmitting
+					? `Creating ${submittedSandwichType} Sandwich`
+					: `Create Sandwich`}
+			</button>
+		</Form>
+	)
+}
 ```
 
-Remix knows the code and data needed to render that page just by looking at the
-URL. So when it appears that the user is going to click on that link, Remix can
-start loading the code and data for that page in the background. This is called
-**prefetching**. When the user clicks on the link, the page will be rendered
-instantly because the code and data is already loaded!
-
-Checkout
-[📜 the Link prefetch docs](https://remix.run/docs/en/main/components/link#prefetch)
-for more info on how to take advantage of this. We don't want to add this as a
-default to all links because that would probably be overkill, but we definitely
-want it on the links on the user profile page. Could you do that please?
-
-Let's also add it to each of the note links in the list of notes.
-
-To test it out, open up the network tab and/or the elements, and see what
-happens when you hover over the link you add these props to.
+🧝‍♂️ I've created a `<StatusButton />` component that has a `status="pending"`
+prop you can use for this if you like. We'll also want to disable the button
+when the form is submitting.

@@ -34,6 +34,7 @@ module.exports = {
 	],
 	plugins: ['@trivago/prettier-plugin-sort-imports'],
 	importOrder: [
+		'^node',
 		'^@remix-run/(css-bundle|node|react)',
 		'^react',
 		'^@',
