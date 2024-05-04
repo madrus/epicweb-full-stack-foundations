@@ -1,9 +1,10 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
+
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -25,7 +26,7 @@ export default function ProfileRoute() {
 		<div className="container mb-48 mt-36">
 			<h1 className="text-h1">{data.user.name ?? data.user.username}</h1>
 			{/* 🐨 add a prefetch="intent" to this link */}
-			<Link to="notes" className="underline">
+			<Link to="notes" className="underline" prefetch="intent">
 				Notes
 			</Link>
 		</div>

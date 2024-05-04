@@ -1,5 +1,21 @@
 # Prefetching
 
+## My Notes
+
+This excercise seems to be trivial as we only need to add `prefetch="intent"` by a couple of links.
+What was difficult for me was to find out how to see the prefetch working in the Chrome DevTools.
+Here is what I have found out:
+
+- use Chrome not Firefix as the latter does not show the prefetch
+- do NOT disable cache in the network tab
+- refresh the page with the link with prefetch and clean the log in the network tab
+- hover over the link to see a new line appear in the log with method `GET`, type `json`,
+  size in bytes, and nothing in the response body
+- click on the link and now the new line will have method `GET`, type `fetch`,
+  size `(prefetch cache)` and the fetched data in the response body
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/optimizing-resource-loading-with-javascript-prefetching" />
 
 👨‍💼 Now that we have client-side JavaScript, we can start doing cool things to
