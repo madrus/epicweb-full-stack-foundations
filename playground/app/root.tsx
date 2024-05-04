@@ -1,5 +1,4 @@
 import os from 'node:os'
-
 import { cssBundleHref } from '@remix-run/css-bundle'
 import { json, type LinksFunction } from '@remix-run/node'
 import {
@@ -11,7 +10,6 @@ import {
 	ScrollRestoration,
 	useLoaderData,
 } from '@remix-run/react'
-
 import faviconAssetUrl from './assets/favicon.svg'
 import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
@@ -27,6 +25,7 @@ export const links: LinksFunction = () => {
 }
 
 export async function loader() {
+	// 🐨 add an ENV property to this which is the result of calling getEnv()
 	return json({ username: os.userInfo().username })
 }
 
@@ -62,8 +61,11 @@ export default function App() {
 					<p>Built with ♥️ by {data.username}</p>
 				</div>
 				<div className="h-5" />
-				{/* 🐨 Add ScrollRestoration from '@remix-run/react' here */}
 				<ScrollRestoration />
+				{/*
+					🐨 add an inline script here using dangerouslySetInnerHTML which
+					sets window.ENV to the JSON.stringified value of data.ENV
+				*/}
 				<Scripts />
 				<EpicShop />
 				<LiveReload />

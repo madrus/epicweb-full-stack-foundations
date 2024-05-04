@@ -1,10 +1,9 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
-
 import { db } from '#app/utils/db.server.ts'
 import { cn, invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const owner = db.user.findFirst({
 		where: {
 			username: {
@@ -49,7 +48,6 @@ export default function NotesRoute() {
 								<li key={note.id} className="p-1 pr-0">
 									<NavLink
 										to={note.id}
-										// 🐨 add preventScrollReset to the NavLink
 										preventScrollReset
 										className={({ isActive }) =>
 											cn(navLinkDefaultClassName, isActive && 'bg-accent')

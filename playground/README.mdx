@@ -1,60 +1,92 @@
-# Scroll Restoration
+# Custom Scripts
 
-## My notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/environment-variables-for-client-side-and-server-side" />
 
-It took me quite some time to understand KcD's tips about the scrolling behavior.
-At first, nothing I did had led to differences in the screen behavior with vs without `preventScrollReset`.
-I have watched his instruction video many times before I realized that page scrolling
-related to the actual browser page and not just the list of notes or the note details.
-To see the difference one needs to make the screen so small in height that one sees
-the scrollbar of the browser page itself.
-
-## KcD's Workshop
-
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/scripting/page-navigation-with-scroll-behavior" />
-
-👨‍💼 Now that we've got JavaScript running on the page, our customers are noticing
-that their scroll position is not where they expect it to be. For example, if
-you're on the notes list page and you're scrolled down a bit, then clicking the
-"Edit" link leaves you where you are when it should scroll the user to the top
-of the page so they can edit the note. This is because the browser is no longer
-responsible for navigations, so the role of scroll restoration lies in our
-hands!
-
-Luckily, Remix has a
-[📜 `ScrollRestoration`](https://remix.run/docs/en/main/components/scroll-restoration)
-component we can use to fix this. Please use that component!
-
-<callout-info class="aside">
-	Tip: To test this out, make your browser window short so that your page is
-	scrolling, then scroll to the bottom and click the Edit button.
+<callout-info>
+	Please note that the learning objective for this part of the exercise is the
+	use of custom inline scripts. The specific script used is to expose
+	environment variables following a pattern I still need to write an article
+	about. If you struggle to follow the pattern, don't worry about that. Focus on
+	what it takes to get a custom inline script running.
 </callout-info>
 
-Once you've done that, come back here, I've got another task for you.
+🦉 For this step, you need a little more background info about Remix. In Remix,
+you have two "bundles" of JavaScript: the server bundle and the client bundle.
+Each of these has its own "entry" file which is the first file that gets
+executed when the bundle is loaded. Remix has a default entry file for the
+server and the client, but you can override these with your own entry files by
+creating a file named `entry.server.tsx` or `entry.client.tsx` in your `app`
+directory. We'll be customizing both of these in this exercise, so they've been
+added.
 
-You got it done? Ok, great! Now I actually need you to "undo" the scroll
-restoration for a particular navigation. If you're scrolled down a bit on the
-list of notes, then change notes, it's jarring to have the page scroll to the
-top. So for those links, we don't actually want to scroll the user to the top.
-Oh what to do? 😱
+👨‍💼 We want to have some custom dev tools for our app (learn about this concept
+in [Make your own DevTools](https://kentcdodds.com/blog/make-your-own-dev-tools)).
+We want to make sure we only load these in development mode. So we need a way
+to dynamically load this into the client during development. We determine
+whether we're in development based on the environment variable `NODE_ENV`.
 
-Luckily, Remix allows you to control this scroll restoration behavior on a
-per-link basis using the
-[📜 `preventScrollReset`](https://reactrouter.com/en/main/components/link#preventscrollreset)
-prop (through React Router):
+You may be used to using `process.env` to access environment variables, but the
+browser doesn't have access to our server's `process.env` (thank goodness).
+Instead, we need to explicitly provide those variable's values to our app
+using <InlineFile file="app/root.tsx" />'s loader.
 
-```tsx
-<Link preventScrollReset to="candy">
-	Candy
-</Link>
+🧝‍♂️ I added a <InlineFile file="app/utils/env.server.ts" /> file which is
+responsible for ensuring we have the right environment variables in our server
+and makes it easy to get the environment variables that are public and should be
+accessible to our UI code.
+
+Remember that UI code runs both on the server and the client. So what we want is
+something that allows us to have a common global variable that has all the
+environment variables that are public and should be accessible to our UI code.
+For example:
+
+```tsx filename=app/routes/connect-discord.tsx lines=7
+function ConnectDiscord() {
+	return <a href={getDiscordAuthorizeURL()}>Connect to Discord</a>
+}
+
+function getDiscordAuthorizeURL(domainUrl: string) {
+	const url = new URL('https://discord.com/api/oauth2/authorize')
+	url.searchParams.set('client_id', ENV.DISCORD_CLIENT_ID)
+	url.searchParams.set('redirect_uri', `https://example.com/discord/callback`)
+	url.searchParams.set('response_type', 'code')
+	url.searchParams.set('scope', 'identify guilds.join email guilds')
+	return url.toString()
+}
 ```
 
-<callout-info class="aside">
-	Tip: To test this out, make your browser window short so that your page is
-	scrolling, then scroll to the bottom and click different notes.
-</callout-info>
+🧝‍♂️ To do this, I've also created
+custom <InlineFile file="app/entry.server.tsx" />
+and <InlineFile file="app/entry.client.tsx" /> files which override the
+default entry files for the server and client in Remix.
 
-Go ahead and add the `preventScrollReset` prop to those links.
+With the `entry.server.tsx`, we can take care of the server-side of setting this
+global variable which I have done on line 6 with:
 
-- [📜 `<ScrollRestoration />` on Remix](https://remix.run/docs/en/main/components/scroll-restoration)
-- [📜 `<ScrollRestoration />` on React Router](https://reactrouter.com/en/main/components/scroll-restoration) (the remix implementation is built on top of this)
+```tsx lines=6 start=4
+import { getEnv } from './utils/env.server.ts'
+
+global.ENV = getEnv()
+```
+
+The `env.server.ts` file we have sets up TypeScript to auto-complete the `ENV`
+global variable.
+
+👨‍💼 In this part of the exercise, we need to set the global `ENV` variable on the
+client. So when our code hydrates we have access to runtime environment
+variables using the same global variable in either environment (server or
+client).
+
+Right now, all we need in our app is a `MODE` environment variable which is
+`development` or `production`.
+
+Effectively, what we need is a script that does this:
+
+```js
+window.ENV = { MODE: 'development' }
+```
+
+We can do this in <InlineFile file="app/root.tsx" /> and then we'll use that
+`ENV.MODE` variable in <InlineFile file="app/entry.client.tsx" /> to dynamically
+load some devtools (found in <InlineFile file="app/utils/devtools.tsx" />) when
+we're in development mode (`ENV.MODE === 'development'`).
