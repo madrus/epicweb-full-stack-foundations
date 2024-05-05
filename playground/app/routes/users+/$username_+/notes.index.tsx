@@ -1,5 +1,12 @@
 import { type MetaFunction } from '@remix-run/react'
 
+import { type loader as notesLoader } from './notes.tsx'
+
+/**
+ * A component for rendering the notes index route.
+ *
+ * @return {JSX.Element} The JSX element for the notes index route.
+ */
 export default function NotesIndexRoute() {
 	return (
 		<div className="container pt-12">
@@ -9,15 +16,22 @@ export default function NotesIndexRoute() {
 }
 
 // 🦺 check the note below for making this type safe
-export const meta: MetaFunction = ({ params, matches }) => {
+export const meta: MetaFunction<
+	null,
+	{ 'routes/users+/$username_+/notes': typeof notesLoader }
+> = ({ params, matches }) => {
 	// 🐨 use the matches from the parameters to find the route for notes by that ID
 	// 💰 matches.find(m => m.id === 'routes/users+/$username_+/notes')
-	// 🐨 use the matches to find the notes route
+	const notesData = matches.find(
+		m => m.id === 'routes/users+/$username_+/notes',
+	)?.data
 
 	// 🐨 determine the user's display name from the notesMatch's data
-	const displayName = params.username
+	// const displayName = params.name ?? params.username
+	const displayName = notesData?.owner.name ?? params.username
+
 	// 🐨 determine the user's count of notes from the notesMatch's data
-	const noteCount = 0 as number
+	const noteCount = notesData?.notes?.length ?? 0
 	const notesText = noteCount === 1 ? 'note' : 'notes'
 	return [
 		{ title: `${displayName}'s Notes | Epic Notes` },

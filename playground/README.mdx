@@ -1,5 +1,51 @@
 # Parent Data
 
+## My Notes
+
+I love Remix! Just for this one feature that I can use the parent route's loader
+to access data in that parent that is not directly available in the child route's loader.
+
+Here is an example of how we get a count of all notes to add to the meta tags
+in the `app/routes/users+/$username_+/notes.@noteId.tsx`.
+
+```tsx
+// import the paraent route's loader's type
+import { type loader as notesLoader } from './notes.tsx'
+
+// strongly type the MetaFunction by using two loaders' types:
+// - the "loader" is the route's own loader
+// - the "notesLoader" is the parent route's loader
+export const meta: MetaFunction<
+	typeof loader,
+	{ 'routes/users+/$username_+/notes': typeof notesLoader }
+> = ({ data, params, matches }) => {
+	// try `console.log(matches)` to see what the `matches` object looks like
+	// get the parent route's data by its id
+	const notesData = matches.find(
+		m => m.id === 'routes/users+/$username_+/notes',
+	)?.data
+	// let us get the owner's name from the notesData (params does not have it)
+	const displayName = notesData?.owner.name ?? params.username
+	// get the count of notes
+	const noteCount = notesData?.notes?.length ?? 0
+	...
+}
+```
+
+If the current route component does not have any loader like `routes/user+/$username_+/notes.index`,
+we replace the `typeof loader` with `null` in our MetFunction generic type:
+
+```tsx
+export const meta: MetaFunction<
+	null,
+	{ 'routes/users+/$username_+/notes': typeof notesLoader }
+> = ({  params, matches }) => {
+	...
+}
+```
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/search-engine-optimization/optimizing-metadata-for-user-info" />
 
 👨‍💼 Let's go deeper. When the user shares their notes page (like `/kody/notes`),

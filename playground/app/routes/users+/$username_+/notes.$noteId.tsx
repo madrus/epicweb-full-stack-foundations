@@ -1,11 +1,19 @@
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react'
+import {
+	type ActionFunctionArgs,
+	json,
+	type LoaderFunctionArgs,
+	redirect,
+} from '@remix-run/node'
+import { Form, Link, type MetaFunction, useLoaderData } from '@remix-run/react'
+
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+import { type loader as notesLoader } from './notes.tsx'
+
+export async function loader({ params }: LoaderFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -21,7 +29,7 @@ export async function loader({ params }: DataFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: DataFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	const intent = formData.get('intent')
 
@@ -62,18 +70,20 @@ export default function NoteRoute() {
 }
 
 // 🦺 check the note below for making this type safe
-export const meta: MetaFunction<typeof loader> = ({
-	data,
-	params,
-	matches,
-}) => {
+export const meta: MetaFunction<
+	typeof loader,
+	{ 'routes/users+/$username_+/notes': typeof notesLoader }
+> = ({ data, params, matches }) => {
 	// 🐨 use matches to find the route for notes by that ID
 	// 💰 matches.find(m => m.id === 'routes/users+/$username_+/notes')
-
+	const notesData = matches.find(
+		m => m.id === 'routes/users+/$username_+/notes',
+	)?.data
 	// 🐨 use the data from our loader and our parent's loader to create a title
 	// and description that show the note title, user's name, and the first part of
 	// the note's content.
-	const displayName = params.username
+	// const displayName = params.username
+	const displayName = notesData?.owner.name ?? params.username
 
 	const noteTitle = data?.note.title ?? 'Note'
 	const noteContentsSummary =
