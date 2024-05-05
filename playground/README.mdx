@@ -1,31 +1,50 @@
-# Static meta export
+# Meta Overrides
 
 ## My Notes
 
-We can add and set properties that go into the `<head />` of the page inside the `App` function
-in the `app/root.tsx`. This can be even done without using the Remix `<Meta />` component.
-I found it interesting that we can put `className` in the `head` element.
+Remix makes it easy to override meta data for nested routes. For that we need a `<Meta />` component
+and the `meta` function export. We usually add `<Meta />` to `app/root.tsx` top level component.
+
+Then we can add the `meta` export to any nested route:
+
+```tsx filename=app/routes/sandwiches.tsx
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Sandwich Shop' },
+		{ name: 'description', content: 'Fill your tummy with something yummy' },
+	]
+}
+```
+
+> Just make sure you import `MetaFunction` from `@remix-run/react`, not `@remix-run/node`.
 
 ## KcD's Workshop
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/search-engine-optimization/configuring-meta-tags" />
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/search-engine-optimization/dynamic-metadata-for-different-routes" />
 
-👨‍💼 Have you gotten a look at the browser tab for our app? It looks like
-nonsense! Let's at least add a nice title. Also, we should probably set a couple
-other configuration bits of metadata as well.
+👨‍💼 We want to be able to override the `title` and `description` for certain
+pages. Specifically, we want <LinkToApp to="/users/kody" /> to have the
+following meta:
 
-💰 Note, we're not going to use the Remix `<Meta />` component yet. We're just
-rendering things directly in the `<head>` for now.
+- **Title**: Profile | Epic Notes
+- **Description**: Checkout this Profile on Epic Notes
 
-<details>
+To do this, we'll need to use
+Remix's conventional `meta` export for nested routes in combination with its
+`<Meta />` component.
 
-<summary>Here's a syntax reminder if you need</summary>
+As a reminder, here's what the API looks like:
 
-```html
-<title>My Page</title>
-<meta name="description" content="This is my page" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta charset="utf-8" />
+```tsx filename=app/routes/sandwiches.tsx
+import { type MetaFunction } from '@remix-run/react'
+
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Sandwich Shop' },
+		{ name: 'description', content: 'Fill your tummy with something yummy' },
+	]
+}
 ```
 
-</details>
+- [📜 `<Meta />`](https://remix.run/docs/en/main/components/meta)
+- [📜 `meta` export](https://remix.run/docs/en/main/route/meta-v2)

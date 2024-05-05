@@ -6,6 +6,8 @@ import {
 	Link,
 	Links,
 	LiveReload,
+	Meta,
+	type MetaFunction,
 	Outlet,
 	Scripts,
 	ScrollRestoration,
@@ -27,6 +29,16 @@ export const links: LinksFunction = () => {
 	].filter(Boolean)
 }
 
+export const meta: MetaFunction = () => {
+	/* 🐨 move the title and description to the meta export */
+	return [
+		{ title: 'Epic Notes' },
+		{ name: 'description', content: "Your own captain's log" },
+		{ charSet: 'utf-8' },
+		{ name: 'viewport', content: 'width=device-width,initial-scale=1' },
+	]
+}
+
 export async function loader() {
 	return json({ username: os.userInfo().username, ENV: getEnv() })
 }
@@ -36,17 +48,8 @@ export default function App() {
 	return (
 		<html lang="en" className="h-full overflow-x-hidden">
 			<head>
-				{/*	🐨 add <title>	(use whatever you'd like for the title)*/}
-				<title>Your Epic Notes App</title>
-				{/*🐨 add <meta> for description (use whatever you'd like for the description) */}
-				<meta
-					name="description"
-					content="The app to keep your personal notes always ready at hand"
-				/>
-				{/*	🐨 add <meta> for charSet 💰 here's a good charSet value: "utf-8" */}
-				<meta charSet="utf-8" />
-				{/*	🐨 add <meta> for and viewport 💰 here's a good viewport value: "width=device-width,initial-scale=1" */}
-				<meta name="viewport" content="width=device-width,initial-scale=1" />
+				{/* 🐨 add the Meta component here */}
+				<Meta />
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
@@ -87,3 +90,7 @@ export default function App() {
 		</html>
 	)
 }
+
+// 🐨 add a meta export here
+// 🐨 you'll want a title and a description
+// 🐨 don't move the charSet or viewport though. We don't want to override those.

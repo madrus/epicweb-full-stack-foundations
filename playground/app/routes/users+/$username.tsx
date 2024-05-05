@@ -1,9 +1,10 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { Link, type MetaFunction, useLoaderData } from '@remix-run/react'
+
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -29,4 +30,15 @@ export default function ProfileRoute() {
 			</Link>
 		</div>
 	)
+}
+
+// 🐨 add a meta export
+// 💰 title should be "Profile | Epic Notes"
+// 💰 description should be "Checkout this Profile on Epic Notes"
+export const meta: MetaFunction = () => {
+	/* 🐨 move the title and description to the meta export */
+	return [
+		{ title: 'Profile | Epic Notes' },
+		{ name: 'description', content: 'Checkout this Profile on Epic Notes' },
+	]
 }
