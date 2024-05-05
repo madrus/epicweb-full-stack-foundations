@@ -1,7 +1,5 @@
 import * as React from 'react'
-
 import { cn } from '#app/utils/misc.tsx'
-
 import { Button, type ButtonProps } from './button.tsx'
 
 export const StatusButton = React.forwardRef<
