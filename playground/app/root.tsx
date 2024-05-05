@@ -1,4 +1,5 @@
 import os from 'node:os'
+
 import { cssBundleHref } from '@remix-run/css-bundle'
 import { json, type LinksFunction } from '@remix-run/node'
 import {
@@ -10,6 +11,7 @@ import {
 	ScrollRestoration,
 	useLoaderData,
 } from '@remix-run/react'
+
 import faviconAssetUrl from './assets/favicon.svg'
 import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
@@ -34,16 +36,17 @@ export default function App() {
 	return (
 		<html lang="en" className="h-full overflow-x-hidden">
 			<head>
-				{/*
-					🐨 add <title>
-					(use whatever you'd like for the title)
-					🐨 add <meta> for description
-					(use whatever you'd like for the description)
-					🐨 add <meta> for charSet
-					💰 here's a good charSet value: "utf-8"
-					🐨 add <meta> for and viewport
-					💰 here's a good viewport value: "width=device-width,initial-scale=1"
-				 */}
+				{/*	🐨 add <title>	(use whatever you'd like for the title)*/}
+				<title>Your Epic Notes App</title>
+				{/*🐨 add <meta> for description (use whatever you'd like for the description) */}
+				<meta
+					name="description"
+					content="The app to keep your personal notes always ready at hand"
+				/>
+				{/*	🐨 add <meta> for charSet 💰 here's a good charSet value: "utf-8" */}
+				<meta charSet="utf-8" />
+				{/*	🐨 add <meta> for and viewport 💰 here's a good viewport value: "width=device-width,initial-scale=1" */}
+				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
