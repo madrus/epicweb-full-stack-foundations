@@ -1,5 +1,25 @@
 # Dynamic meta export
 
+## My Notes
+
+In order to be able to show dynamic data we get from the loader in the meta export,
+we can use the generic version of the `meta` export:
+
+```tsx
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	const name = data?.user.name ?? data?.user.username
+	return [
+		{ title: `${name}'s profile | Epic Notes` },
+		{
+			name: 'description',
+			content: `Checkout ${name}'s profile on Epic Notes`,
+		},
+	]
+}
+```
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/search-engine-optimization/customizing-meta-tags-with-dynamic-data" />
 
 👨‍💼 For our user profile page, we want our users to be excited to share their
