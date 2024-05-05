@@ -1,9 +1,10 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { Link, type MetaFunction, useLoaderData } from '@remix-run/react'
+
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -36,9 +37,13 @@ export default function ProfileRoute() {
 // MetaFunction generic type.
 // 🐨 use the data to get the user's name
 // 💯 handle the case where the user doesn't have a name (fallback to username)
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	const name = data?.user.name ?? data?.user.username
 	return [
-		{ title: 'Profile | Epic Notes' },
-		{ name: 'description', content: 'Checkout this Profile on Epic Notes' },
+		{ title: `${name}'s profile | Epic Notes` },
+		{
+			name: 'description',
+			content: `Checkout ${name}'s profile on Epic Notes`,
+		},
 	]
 }
