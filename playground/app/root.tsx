@@ -1,5 +1,4 @@
 import os from 'node:os'
-
 import { cssBundleHref } from '@remix-run/css-bundle'
 import { json, type LinksFunction } from '@remix-run/node'
 import {
@@ -7,13 +6,12 @@ import {
 	Links,
 	LiveReload,
 	Meta,
-	type MetaFunction,
 	Outlet,
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	type MetaFunction,
 } from '@remix-run/react'
-
 import faviconAssetUrl from './assets/favicon.svg'
 import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
@@ -29,16 +27,6 @@ export const links: LinksFunction = () => {
 	].filter(Boolean)
 }
 
-export const meta: MetaFunction = () => {
-	/* 🐨 move the title and description to the meta export */
-	return [
-		{ title: 'Epic Notes' },
-		{ name: 'description', content: "Your own captain's log" },
-		{ charSet: 'utf-8' },
-		{ name: 'viewport', content: 'width=device-width,initial-scale=1' },
-	]
-}
-
 export async function loader() {
 	return json({ username: os.userInfo().username, ENV: getEnv() })
 }
@@ -48,8 +36,9 @@ export default function App() {
 	return (
 		<html lang="en" className="h-full overflow-x-hidden">
 			<head>
-				{/* 🐨 add the Meta component here */}
 				<Meta />
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
@@ -91,6 +80,9 @@ export default function App() {
 	)
 }
 
-// 🐨 add a meta export here
-// 🐨 you'll want a title and a description
-// 🐨 don't move the charSet or viewport though. We don't want to override those.
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Epic Notes' },
+		{ name: 'description', content: `Your own captain's log` },
+	]
+}
