@@ -1,9 +1,15 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import {
+	Link,
+	type MetaFunction,
+	useLoaderData,
+	useRouteError,
+} from '@remix-run/react'
+
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	// throw new Error('🐨 Loader error')
 	const user = db.user.findFirst({
 		where: {
@@ -45,6 +51,16 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 }
 
 // 🐨 export an ErrorBoundary here
-// 🐨 get the error from useRouteError()
-// 💰 If you'd like it to look nice, you can use this class name:
-// className="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground"
+export function ErrorBoundary() {
+	// 🐨 get the error from useRouteError()
+	const error = useRouteError()
+	console.log(error)
+
+	return (
+		// 💰 If you'd like it to look nice, you can use this class name:
+		<div className="container mx-auto flex flex-col h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
+			<h1 className="text-h1 mb-4">Oh no!</h1>
+			<p>Something bad happened! Sorry!</p>
+		</div>
+	)
+}
