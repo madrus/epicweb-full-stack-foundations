@@ -4,6 +4,7 @@ import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
 export async function loader({ params }: DataFunctionArgs) {
+	// throw new Error('🐨 Loader error')
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -20,6 +21,7 @@ export async function loader({ params }: DataFunctionArgs) {
 }
 
 export default function ProfileRoute() {
+	// throw new Error('🐨 Component error')
 	const data = useLoaderData<typeof loader>()
 	return (
 		<div className="container mb-48 mt-36">
@@ -41,3 +43,8 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 		},
 	]
 }
+
+// 🐨 export an ErrorBoundary here
+// 🐨 get the error from useRouteError()
+// 💰 If you'd like it to look nice, you can use this class name:
+// className="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground"
