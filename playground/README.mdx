@@ -1,5 +1,23 @@
 # Handle Route Errors
 
+## My Notes
+
+A Remix [ErrorBoundary](https://remix.run/docs/en/main/route/error-boundary)
+component works just like normal React
+[error boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary),
+but with a few extra capabilities. When there is an error in your route component,
+the `ErrorBoundary` will be rendered in its place, nested inside any parent routes.
+`ErrorBoundary` components also render when there is an error in the `loader`
+or `action` functions for a route, so all errors for that route may be handled in one spot.
+
+To obtain the thrown object, you can use the `useRouteError` hook.
+
+```tsx
+const error = useRouteError()
+```
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/improving-error-handling-and-ui-on-user-profile-page" />
 
 👨‍💼 If you open <InlineFile file="app/routes/users+/$username.tsx" /> and
