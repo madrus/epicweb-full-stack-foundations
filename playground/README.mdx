@@ -1,5 +1,29 @@
 # Handle Thrown Responses
 
+## My Notes
+
+We can leverage the `useRouteError` hook and `isRouteErrorResponse` utility
+in Remix's `ErrorBoundary` component to make the error messages more informative.
+
+```tsx
+export function ErrorBoundary() {
+	const error = useRouteError()
+	const params = useParams()
+	let errorMessage = 'Something went wrong. Sorry about that.'
+	if (isRouteErrorResponse(error) && error.status === 404) {
+		errorMessage = `No user found with username ${params.username}`
+	}
+	return (
+		<div className="container mx-auto flex flex-col h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
+			<h1 className="text-h1">Oh no!</h1>
+			<p>{errorMessage}</p>
+		</div>
+	)
+}
+```
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/handling-expected-errors-with-error-boundaries" />
 
 🦉 As mentioned earlier, Remix allows you to `throw new Response` from your
@@ -7,9 +31,10 @@ loaders and actions so you can control the status code and other information
 sent in the response. For example:
 
 ```tsx filename=app/routes/sandwiches.$sandwichId.tsx lines=10,13,18
-import { json, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
-import { invariantResponse, useIsSubmitting } from '#app/utils/misc.tsx'
+import { type DataFunctionArgs, json, type MetaFunction } from '@remix-run/node'
+
 import { getUser } from '#app/utils/auth.server'
+import { invariantResponse, useIsSubmitting } from '#app/utils/misc.tsx'
 import { getSandwich } from '#app/utils/sandwiches.server'
 
 export async function loader({ request, params }: DataFunctionArgs) {
