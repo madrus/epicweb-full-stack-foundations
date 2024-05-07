@@ -1,11 +1,10 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, type MetaFunction, useLoaderData } from '@remix-run/react'
-
-import { GeneralErrorBoundary } from '#app/components/error-boundary.js'
+import { json, type DataFunctionArgs } from '@remix-run/node'
+import { Link, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -45,12 +44,13 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 }
 
 export function ErrorBoundary() {
-	// 🐨 you can swap most of this stuff for GeneralErrorBoundary and a statusHandler for 404
-	const statusHandlers = {
-		404: ({ params }: { params: Record<string, string | undefined> }) => (
-			<p>No user found with the username {params.username}</p>
-		),
-	}
-
-	return <GeneralErrorBoundary statusHandlers={statusHandlers} />
+	return (
+		<GeneralErrorBoundary
+			statusHandlers={{
+				404: ({ params }) => (
+					<p>No user with the username "{params.username}" exists</p>
+				),
+			}}
+		/>
+	)
 }

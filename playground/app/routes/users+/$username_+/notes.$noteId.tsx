@@ -1,20 +1,13 @@
-import {
-	type ActionFunctionArgs,
-	json,
-	type LoaderFunctionArgs,
-	redirect,
-} from '@remix-run/node'
-import { Form, Link, type MetaFunction, useLoaderData } from '@remix-run/react'
-
-import { GeneralErrorBoundary } from '#app/components/error-boundary.js'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
-
 import { type loader as notesLoader } from './notes.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -30,7 +23,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const intent = formData.get('intent')
 
@@ -92,13 +85,14 @@ export const meta: MetaFunction<
 	]
 }
 
-// 🐨 add an error boundary here that uses GeneralErrorBoundary and a statusHandler for 404
 export function ErrorBoundary() {
-	const statusHandlers = {
-		404: ({ params }: { params: Record<string, string | undefined> }) => (
-			<p>No note found with id {params.noteId}</p>
-		),
-	}
-
-	return <GeneralErrorBoundary statusHandlers={statusHandlers} />
+	return (
+		<GeneralErrorBoundary
+			statusHandlers={{
+				404: ({ params }) => (
+					<p>No note with the id "{params.noteId}" exists</p>
+				),
+			}}
+		/>
+	)
 }

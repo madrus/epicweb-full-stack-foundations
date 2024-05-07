@@ -13,6 +13,7 @@ import {
 	type MetaFunction,
 } from '@remix-run/react'
 import faviconAssetUrl from './assets/favicon.svg'
+import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { EpicShop } from './epicshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
@@ -28,11 +29,19 @@ export const links: LinksFunction = () => {
 }
 
 export async function loader() {
+	// throw new Error('🐨 root loader error')
 	return json({ username: os.userInfo().username, ENV: getEnv() })
 }
 
+// 🐨 Create a Document component here that renders almost everything that's in
+// the App with the exception of the visual stuff in the body. It should not
+// use useLoaderData because we can't rely on that in the error case.
+
 export default function App() {
+	// throw new Error('🐨 root component error')
 	const data = useLoaderData<typeof loader>()
+	// 🐨 replace most of this with the <Document> component and render the
+	// header, outlet, and footer inside of it.
 	return (
 		<html lang="en" className="h-full overflow-x-hidden">
 			<head>
@@ -85,4 +94,9 @@ export const meta: MetaFunction = () => {
 		{ title: 'Epic Notes' },
 		{ name: 'description', content: `Your own captain's log` },
 	]
+}
+
+export function ErrorBoundary() {
+	// 🐨 render the GeneralErrorBoundary in your new Document component.
+	return <GeneralErrorBoundary />
 }

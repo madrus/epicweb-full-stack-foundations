@@ -1,11 +1,10 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
-
-import { GeneralErrorBoundary } from '#app/components/error-boundary.js'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { cn, invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const owner = db.user.findFirst({
 		where: {
 			username: {
@@ -71,13 +70,14 @@ export default function NotesRoute() {
 	)
 }
 
-// 🐨 add an error boundary here that uses GeneralErrorBoundary and a statusHandler for 404
 export function ErrorBoundary() {
-	const statusHandlers = {
-		404: ({ params }: { params: Record<string, string | undefined> }) => (
-			<p>No notes owner found with the username {params.owner}</p>
-		),
-	}
-
-	return <GeneralErrorBoundary statusHandlers={statusHandlers} />
+	return (
+		<GeneralErrorBoundary
+			statusHandlers={{
+				404: ({ params }) => (
+					<p>No user with the username "{params.username}" exists</p>
+				),
+			}}
+		/>
+	)
 }
