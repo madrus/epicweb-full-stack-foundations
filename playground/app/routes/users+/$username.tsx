@@ -1,14 +1,17 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import {
+	isRouteErrorResponse,
 	Link,
-	useLoaderData,
-	useRouteError,
 	type MetaFunction,
+	useLoaderData,
+	useParams,
+	useRouteError,
 } from '@remix-run/react'
+
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -51,19 +54,24 @@ export function ErrorBoundary() {
 	const error = useRouteError()
 	// 🐨 get the params so we can display the username that is causing the error
 	// 💰 useParams comes from @remix-run/react
-	console.error(error)
+	const params = useParams()
 
 	// 🐨 create the error message that will be displayed to the user
 	// you can default it to the existing error message we have below.
+	let errorMessage = 'Something went wrong. Sorry about that.'
 
 	// 🐨 if the error is a 404 Response error, then display a different message
 	// that explains no user by the username given was found.
 	// 💰 isRouteErrorResponse comes from @remix-run/react
+	if (isRouteErrorResponse(error) && error.status === 404) {
+		errorMessage = `No user found with username ${params.username}`
+	}
 
 	return (
-		<div className="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
+		<div className="container mx-auto flex flex-col h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
+			<h1 className="text-h1">Oh no!</h1>
 			{/* 🐨 display the error message here */}
-			<p>Oh no, something went wrong. Sorry about that.</p>
+			<p>{errorMessage}</p>
 		</div>
 	)
 }
