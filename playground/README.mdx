@@ -1,54 +1,145 @@
-# Handle Route Errors
+# Handle Thrown Responses
 
-## My Notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/handling-expected-errors-with-error-boundaries" />
 
-A Remix [ErrorBoundary](https://remix.run/docs/en/main/route/error-boundary)
-component works just like normal React
-[error boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary),
-but with a few extra capabilities. When there is an error in your route component,
-the `ErrorBoundary` will be rendered in its place, nested inside any parent routes.
-`ErrorBoundary` components also render when there is an error in the `loader`
-or `action` functions for a route, so all errors for that route may be handled in one spot.
+🦉 As mentioned earlier, Remix allows you to `throw new Response` from your
+loaders and actions so you can control the status code and other information
+sent in the response. For example:
 
-To obtain the thrown object, you can use the `useRouteError` hook.
+```tsx filename=app/routes/sandwiches.$sandwichId.tsx lines=10,13,18
+import { json, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { invariantResponse, useIsSubmitting } from '#app/utils/misc.tsx'
+import { getUser } from '#app/utils/auth.server'
+import { getSandwich } from '#app/utils/sandwiches.server'
 
-```tsx
-const error = useRouteError()
-```
+export async function loader({ request, params }: DataFunctionArgs) {
+	const user = await getUser(request)
+	if (!user) {
+		// this response will be handled by our error boundary
+		throw new Response('Unauthorized', { status: 401 })
+	}
+	// this invariant with throw an error which our error boundary will handle as well
+	invariantResponse(params.sandwichId, 'sandwichId is required')
 
-## KcD's Workshop
-
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/improving-error-handling-and-ui-on-user-profile-page" />
-
-👨‍💼 If you open <InlineFile file="app/routes/users+/$username.tsx" /> and
-comment in one of the errors Kody 🐨 added for you,
-then try loading <LinkToApp to="/users/kody" />, you'll notice the error
-looks pretty bad. We definitely want to customize that!
-
-Could you please add an `ErrorBoundary` component
-to <InlineFile file="app/routes/users+/$username.tsx" /> so we can handle
-errors that happen there in our app?
-
-Please make sure to log the error in the console with `console.error` so we can
-see what's going on in our debugging.
-
-As a reminder, here's an example of what an error boundary looks like:
-
-```tsx filename=app/routes/errors-oh-no.tsx
-import { useRouteError } from '@remix-run/react'
-
-export function ErrorBoundary() {
-	const error = useRouteError()
-	console.error(error)
-
-	return (
-		<div>
-			<h1>Oh no!</h1>
-			<p>Something bad happened! Sorry!</p>
-		</div>
-	)
+	const sandwich = await getSandwich(params.sandwichId)
+	if (!sandwich) {
+		// this response will be handled by our error boundary
+		throw new Response('Not Found', { status: 404 })
+	}
+	return json({ sandwich })
 }
 ```
 
-- [📜 `ErrorBoundary` export](https://remix.run/docs/en/main/route/error-boundary-v2)
-- [📜 `useRouteError()` hook](https://remix.run/docs/en/main/hooks/use-route-error)
+<callout-info>
+	We've got a handy `invariantResponse` which we use to throw responses for us
+	more easily which works just the same way, but for the sake of clarity, most
+	of these examples throw raw responses.
+</callout-info>
+
+When you throw a `Response` from a loader or action, Remix will catch it and
+render your `ErrorBoundary` component instead of the regular route component. In
+that case, the `error` you get from `useRouteError` will be the response object
+that was thrown.
+
+Because it's impossible to know what error was thrown, it can be difficult to
+display the correct error message to the user. Which is why Remix also exports a
+`isRouteErrorResponse` utility which checks whether the error is a Response. If
+it is, then you can access the `.status` property to know the status code and
+render the right message based on that. Your response can also have a body if
+you want the error message to be determined by the server.
+
+Here's an example of handling a response error:
+
+```tsx
+export function ErrorBoundary() {
+	const error = useRouteError()
+	if (isRouteErrorResponse(error)) {
+		if (error.status === 404) {
+			return <p>Not Found</p>
+		}
+		if (error.status === 401) {
+			return <p>Unauthorized</p>
+		}
+	}
+	return <p>Something went wrong</p>
+}
+```
+
+This mechanism of throwing responses is quite powerful because it allows us to
+build really nice abstractions. It's exactly what we're doing with the
+`invariantResponse` utility. As another example, if we didn't like having to do
+that `user` check everywhere, we could create an abstraction that does it for
+us:
+
+```tsx
+export async function requireUser(request: Request) {
+	const user = await getUser(request)
+	if (!user) {
+		throw new Response('Unauthorized', { status: 401 })
+	}
+	return user
+}
+```
+
+And now we know that if we get the user from `requireUser` they are in fact
+logged in! On top of that, you can throw more than just 400s, you could even
+throw a redirect!
+
+```tsx
+export async function requireUser(request: Request) {
+	const user = await getUser(request)
+	if (!user) {
+		throw new Response(null, { status: 302, headers: { Location: '/login' } })
+	}
+	return user
+}
+```
+
+Remix has a handy utility for redirects as well:
+
+```tsx
+import { redirect } from '@remix-run/node'
+
+export async function requireUser(request: Request) {
+	const user = await getUser(request)
+	if (!user) {
+		throw redirect('/login')
+	}
+	return user
+}
+```
+
+This is a great way to make nice utilities that make the regular application
+code much easier to write and read:
+
+```tsx filename=app/routes/sandwiches.$sandwichId.tsx add=8,17 remove=9-13,18-22
+import { json, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { invariantResponse, useIsSubmitting } from '#app/utils/misc.tsx'
+import { getUser } from '#app/utils/auth.server'
+import { requireUser } from '#app/utils/auth.server'
+import { getSandwich } from '#app/utils/sandwiches.server'
+
+export async function loader({ request, params }: DataFunctionArgs) {
+	const user = await requireUser(request)
+	const user = await getUser(request)
+	if (!user) {
+		// this response will be handled by our error boundary
+		throw new Response('Unauthorized', { status: 401 })
+	}
+	// this invariant with throw an error which our error boundary will handle as well
+	invariantResponse(params.sandwichId, 'sandwichId is required')
+
+	const sandwich = await requireSandwich(params.sandwichId)
+	const sandwich = await getSandwich(params.sandwichId)
+	if (!sandwich) {
+		// this response will be handled by our error boundary
+		throw new Response('Not Found', { status: 404 })
+	}
+	return json({ sandwich })
+}
+```
+
+👨‍💼 Great, with all that knowledge, now I'd like you to upgrade our error
+boundary in <InlineFile file="app/routes/users+/$username.tsx" /> to handle
+a 404. Once you're done, you should be able to go to <LinkToApp to="/users/not_kody" />
+and see a nice error message there.

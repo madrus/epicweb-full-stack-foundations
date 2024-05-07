@@ -1,16 +1,14 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Link,
-	type MetaFunction,
 	useLoaderData,
 	useRouteError,
+	type MetaFunction,
 } from '@remix-run/react'
-
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
-	// throw new Error('🐨 Loader error')
+export async function loader({ params }: DataFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -27,7 +25,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function ProfileRoute() {
-	// throw new Error('🐨 Component error')
 	const data = useLoaderData<typeof loader>()
 	return (
 		<div className="container mb-48 mt-36">
@@ -50,17 +47,23 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 	]
 }
 
-// 🐨 export an ErrorBoundary here
 export function ErrorBoundary() {
-	// 🐨 get the error from useRouteError()
 	const error = useRouteError()
-	console.log(error)
+	// 🐨 get the params so we can display the username that is causing the error
+	// 💰 useParams comes from @remix-run/react
+	console.error(error)
+
+	// 🐨 create the error message that will be displayed to the user
+	// you can default it to the existing error message we have below.
+
+	// 🐨 if the error is a 404 Response error, then display a different message
+	// that explains no user by the username given was found.
+	// 💰 isRouteErrorResponse comes from @remix-run/react
 
 	return (
-		// 💰 If you'd like it to look nice, you can use this class name:
-		<div className="container mx-auto flex flex-col h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
-			<h1 className="text-h1 mb-4">Oh no!</h1>
-			<p>Something bad happened! Sorry!</p>
+		<div className="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
+			{/* 🐨 display the error message here */}
+			<p>Oh no, something went wrong. Sorry about that.</p>
 		</div>
 	)
 }
