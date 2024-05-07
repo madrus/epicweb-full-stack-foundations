@@ -1,17 +1,16 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import {
-	isRouteErrorResponse,
 	Link,
-	type MetaFunction,
+	isRouteErrorResponse,
 	useLoaderData,
 	useParams,
 	useRouteError,
+	type MetaFunction,
 } from '@remix-run/react'
-
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: DataFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -51,27 +50,20 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 }
 
 export function ErrorBoundary() {
+	// 🐨 you can swap most of this stuff for GeneralErrorBoundary and a statusHandler for 404
 	const error = useRouteError()
-	// 🐨 get the params so we can display the username that is causing the error
-	// 💰 useParams comes from @remix-run/react
 	const params = useParams()
+	console.error(error)
 
-	// 🐨 create the error message that will be displayed to the user
-	// you can default it to the existing error message we have below.
-	let errorMessage = 'Something went wrong. Sorry about that.'
+	let errorMessage = <p>Oh no, something went wrong. Sorry about that.</p>
 
-	// 🐨 if the error is a 404 Response error, then display a different message
-	// that explains no user by the username given was found.
-	// 💰 isRouteErrorResponse comes from @remix-run/react
 	if (isRouteErrorResponse(error) && error.status === 404) {
-		errorMessage = `No user found with username ${params.username}`
+		errorMessage = <p>No user with the username "{params.username}" exists</p>
 	}
 
 	return (
-		<div className="container mx-auto flex flex-col h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
-			<h1 className="text-h1">Oh no!</h1>
-			{/* 🐨 display the error message here */}
-			<p>{errorMessage}</p>
+		<div className="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
+			{errorMessage}
 		</div>
 	)
 }

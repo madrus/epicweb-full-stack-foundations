@@ -83,3 +83,5 @@ export const meta: MetaFunction<
 		},
 	]
 }
+
+// 🐨 add an error boundary here that uses GeneralErrorBoundary and a statusHandler for 404

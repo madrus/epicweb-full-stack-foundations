@@ -76,3 +76,5 @@ export default function NoteEdit() {
 		</Form>
 	)
 }
+
+// 🐨 add an error boundary here that uses GeneralErrorBoundary and a statusHandler for 404

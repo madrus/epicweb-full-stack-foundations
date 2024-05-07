@@ -68,3 +68,5 @@ export default function NotesRoute() {
 		</main>
 	)
 }
+
+// 🐨 add an error boundary here that uses GeneralErrorBoundary and a statusHandler for 404
