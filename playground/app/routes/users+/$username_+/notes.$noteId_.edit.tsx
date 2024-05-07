@@ -1,5 +1,12 @@
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import {
+	type ActionFunctionArgs,
+	json,
+	type LoaderFunctionArgs,
+	redirect,
+} from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
+
+import { GeneralErrorBoundary } from '#app/components/error-boundary.js'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Input } from '#app/components/ui/input.tsx'
@@ -9,7 +16,7 @@ import { Textarea } from '#app/components/ui/textarea.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse, useIsSubmitting } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const note = db.note.findFirst({
 		where: {
 			id: {
@@ -25,7 +32,7 @@ export async function loader({ params }: DataFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: DataFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	const title = formData.get('title')
 	const content = formData.get('content')
@@ -78,3 +85,12 @@ export default function NoteEdit() {
 }
 
 // 🐨 add an error boundary here that uses GeneralErrorBoundary and a statusHandler for 404
+export function ErrorBoundary() {
+	const statusHandlers = {
+		404: ({ params }: { params: Record<string, string | undefined> }) => (
+			<p>No note to edit found with id {params.noteId}</p>
+		),
+	}
+
+	return <GeneralErrorBoundary statusHandlers={statusHandlers} />
+}

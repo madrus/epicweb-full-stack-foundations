@@ -1,16 +1,11 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
-import {
-	Link,
-	isRouteErrorResponse,
-	useLoaderData,
-	useParams,
-	useRouteError,
-	type MetaFunction,
-} from '@remix-run/react'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { Link, type MetaFunction, useLoaderData } from '@remix-run/react'
+
+import { GeneralErrorBoundary } from '#app/components/error-boundary.js'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const user = db.user.findFirst({
 		where: {
 			username: {
@@ -51,19 +46,11 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 
 export function ErrorBoundary() {
 	// 🐨 you can swap most of this stuff for GeneralErrorBoundary and a statusHandler for 404
-	const error = useRouteError()
-	const params = useParams()
-	console.error(error)
-
-	let errorMessage = <p>Oh no, something went wrong. Sorry about that.</p>
-
-	if (isRouteErrorResponse(error) && error.status === 404) {
-		errorMessage = <p>No user with the username "{params.username}" exists</p>
+	const statusHandlers = {
+		404: ({ params }: { params: Record<string, string | undefined> }) => (
+			<p>No user found with the username {params.username}</p>
+		),
 	}
 
-	return (
-		<div className="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground">
-			{errorMessage}
-		</div>
-	)
+	return <GeneralErrorBoundary statusHandlers={statusHandlers} />
 }
