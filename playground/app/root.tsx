@@ -1,5 +1,4 @@
 import os from 'node:os'
-
 import { cssBundleHref } from '@remix-run/css-bundle'
 import { json, type LinksFunction } from '@remix-run/node'
 import {
@@ -7,13 +6,12 @@ import {
 	Links,
 	LiveReload,
 	Meta,
-	type MetaFunction,
 	Outlet,
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	type MetaFunction,
 } from '@remix-run/react'
-
 import faviconAssetUrl from './assets/favicon.svg'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { EpicShop } from './epicshop.tsx'
@@ -35,9 +33,6 @@ export async function loader() {
 	return json({ username: os.userInfo().username, ENV: getEnv() })
 }
 
-// 🐨 Create a Document component here that renders almost everything that's in
-// the App with the exception of the visual stuff in the body. It should not
-// use useLoaderData because we can't rely on that in the error case.
 function Document({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" className="h-full overflow-x-hidden">
@@ -61,8 +56,6 @@ function Document({ children }: { children: React.ReactNode }) {
 export default function App() {
 	// throw new Error('🐨 root component error')
 	const data = useLoaderData<typeof loader>()
-	// 🐨 replace most of this with the <Document> component and render the
-	// header, outlet, and footer inside of it.
 	return (
 		<Document>
 			<header className="container mx-auto py-6">
@@ -106,8 +99,6 @@ export const meta: MetaFunction = () => {
 }
 
 export function ErrorBoundary() {
-	// 🐨 render the GeneralErrorBoundary in your new Document component.
-	// wrap it in the style like that of the outlet hereabove
 	return (
 		<Document>
 			<div className="flex-1">

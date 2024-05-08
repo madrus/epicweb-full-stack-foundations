@@ -1,80 +1,94 @@
-# Root ErrorBoundary
+# Not Found
 
-## My Notes
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/handling-404-errors-in-react-router-with-splat-routes" />
 
-Using `ErrorBoundary` is fine but has a catch. If there's an error in the loader,
-then the component won't get rendered. That applies to all the routes,
-including the root route. So the component is not getting rendered.
-Because it is the `ErrorBoundary` that is getting rendered instead of the component.
+👨‍💼 Right now if you go to a route that doesn't exist (like `/does/not/exist`),
+our root route's error boundary will handle that. Unfortunately, this error
+boundary is pretty limited because we can't rely on the root route's loader for
+any data. This makes our 404 page pretty useless.
 
-Ideally we would like to have a `ErrorBoundary` for the root route to catch all errors
-that weren't caught in the other routes and bubbled all the way up to the root route.
-Unfortunately in case of such an error, when we add it to the root route,
-the main page won't get rendered at all, only the error page.
+To be clear, we do have a 404 page for notes and users that aren't found. So
+going to `/users/does-not-exist` works well. And also
+`/users/kody/notes/does-not-exist` works well too. We just want to do the same
+for routes that don't exist at all. Like `/does-not-exist` or
+`/users/kody/does-not-exist`.
 
-The solution is to move the standard HTML stuff of the root route in `App.tsx`
-into a separate component called `Document` and render the rest as its child component.
-Meaning that that stuff can be used by both the root route and the `ErrorBoundary`.
-What goes in is most of the meta stuff and scripts from outside the `body`
-and maybe even parts of the body that are not dependent on the `useLoaderData()`,
-which we cannot fully trust.
+So we're going to use a router feature called a "splat route" to handle this.
+A splat route effectively says "match any route that starts with this path". So
+we can create a splat route at the end of our router that matches any route that
+starts with `/` and because splat routes receive a lower priority than others,
+we'll know if the splat route gets rendered it's because no other route matched
+so we can show our 404 error.
 
-What we then place in the `App` as children of the `Document` component is
-is header, footer, the `outlet`, and everything referencing `data`.
+<callout-info>
+	It's important to note that splat routes aren't only useful for 404s, but they
+	can be really handy for use with a CMS where the URL segments are dynamic.
+</callout-info>
 
-Then we also place the `GeneralErrorBoundary` into the `Document` component
-giving it the same style (if applicable) as that of the `outlet` element.
+As we're following the `remix-flat-routes` convention, to create a route that
+matches `/*`, 🐨 we'll create a file at <InlineFile file="app/routes/$.tsx" />.
 
-## KcD's Workshop
+With that file created, you need to 🐨 create a loader that throws a `404`
+response:
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/improving-error-handling-with-a-document-component" />
-
-👨‍💼 We don't currently have an `ErrorBoundary` component for our root route. This
-is a problem for two reasons:
-
-1. If we add more routes and they don't have an `ErrorBoundary`, those errors have
-   nowhere to bubble up to.
-2. If there's an error in our root route, we don't have a way to catch it.
-
-So we need you to export an `ErrorBoundary` from the root route. But it's not
-quite that simple like the other routes... You'll see in a bit.
-
-First, add a simple `ErrorBoundary` to the root route. Then uncomment one of
-Kody's errors in the component or the loader. You'll notice that when you
-refresh the page, none of the styles appear. If you look at the source of the
-HTML, you'll see something like this:
-
-```html
-<!doctype html>
-<div
-	class="container mx-auto flex h-full w-full items-center justify-center bg-destructive p-20 text-h2 text-destructive-foreground"
->
-	<p>🐨 root loader error</p>
-</div>
+```tsx
+export async function loader() {
+	throw new Response('Not found', { status: 404 })
+}
 ```
 
-What happened to our... well... everything? Why is it just the contents of our
-error boundary?
+Next, let's 🐨 export the `ErrorBoundary`:
 
-Well, remember that our root component is responsible for rendering everything
-between the `<html>` and `</html>`. So if there's an error rendering that, then
-we won't have any of that stuff in our HTML. All we get is what's rendered in
-the `ErrorBoundary`.
+```tsx
+import { Link, useLocation } from '@remix-run/react'
+import { GeneralErrorBoundary } from '../components/error-boundary.tsx'
 
-So we're going to need to make sure our error boundary renders the basic
-"Document" stuff we need for our HTML document.
-
-We'll do this by turning lots of what's in our `App` component into a `Document`
-component that can be used by both the `App` and the `ErrorBoundary`.
-
-So when you're all done, it should look something like this:
-
-```tsx filename=app/root.tsx
-export default function App() {
-	return <Document>{/* app stuff */}</Document>
-}
+// ...
 
 export function ErrorBoundary() {
-	return <Document>{/* error stuff */}</Document>
+	const location = useLocation()
+	return (
+		<GeneralErrorBoundary
+			statusHandlers={{
+				404: () => (
+					<div className="flex flex-col gap-6">
+						<div className="flex flex-col gap-3">
+							<h1>We can't find this page:</h1>
+							<pre className="text-body-lg whitespace-pre-wrap break-all">
+								{location.pathname}
+							</pre>
+						</div>
+						<Link to="/" className="text-body-md underline">
+							Back to home
+						</Link>
+					</div>
+				),
+			}}
+		/>
+	)
 }
 ```
+
+Finally, we'll want to 🐨 export a default export just in case the loader is
+changed or fails in some way, we'll still be able to display some error to the
+user:
+
+```tsx
+// ...
+
+export default function NotFound() {
+	// due to the loader, this component will never be rendered, but we'll return
+	// the error boundary just in case.
+	return <ErrorBoundary />
+}
+
+// ...
+```
+
+And with that, you should now be able to go to any route that doesn't exist and
+you should still see the header and footer. This will make it a much better user
+experience when folks hit a page that doesn't exist.
+
+- [📜 Remix Splat Routes](https://remix.run/docs/en/main/file-conventions/routes#splat-routes)
+- [📜 React Router splats](https://reactrouter.com/en/main/route/route#splats)
+- [📜 remix-flat-routes](https://github.com/kiliman/remix-flat-routes)
