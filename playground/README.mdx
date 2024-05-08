@@ -1,5 +1,32 @@
 # Root ErrorBoundary
 
+## My Notes
+
+Using `ErrorBoundary` is fine but has a catch. If there's an error in the loader,
+then the component won't get rendered. That applies to all the routes,
+including the root route. So the component is not getting rendered.
+Because it is the `ErrorBoundary` that is getting rendered instead of the component.
+
+Ideally we would like to have a `ErrorBoundary` for the root route to catch all errors
+that weren't caught in the other routes and bubbled all the way up to the root route.
+Unfortunately in case of such an error, when we add it to the root route,
+the main page won't get rendered at all, only the error page.
+
+The solution is to move the standard HTML stuff of the root route in `App.tsx`
+into a separate component called `Document` and render the rest as its child component.
+Meaning that that stuff can be used by both the root route and the `ErrorBoundary`.
+What goes in is most of the meta stuff and scripts from outside the `body`
+and maybe even parts of the body that are not dependent on the `useLoaderData()`,
+which we cannot fully trust.
+
+What we then place in the `App` as children of the `Document` component is
+is header, footer, the `outlet`, and everything referencing `data`.
+
+Then we also place the `GeneralErrorBoundary` into the `Document` component
+giving it the same style (if applicable) as that of the `outlet` element.
+
+## KcD's Workshop
+
 <EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/error-handling/improving-error-handling-with-a-document-component" />
 
 👨‍💼 We don't currently have an `ErrorBoundary` component for our root route. This
